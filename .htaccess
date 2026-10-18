@@ -1,0 +1,18 @@
+# GunsMasterPro Apache reverse-proxy reference.
+# Enable this only on a Hostinger plan that explicitly supports mod_proxy.
+# Coolify/Traefik and Netlify do not use this file.
+
+RewriteEngine On
+RewriteCond %{HTTPS} !=on
+RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+# If Node runs on the same Hostinger account, replace 127.0.0.1:3000 with the
+# provider's assigned Node application endpoint and uncomment the ProxyPass rules.
+# ProxyPreserveHost On
+# ProxyPass / http://127.0.0.1:3000/
+# ProxyPassReverse / http://127.0.0.1:3000/
+
+# Static fallback for a static export only; do not enable alongside reverse proxy.
+# RewriteCond %{REQUEST_FILENAME} !-f
+# RewriteCond %{REQUEST_FILENAME} !-d
+# RewriteRule ^ /index.html [L]

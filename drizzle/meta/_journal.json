@@ -1,0 +1,55 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1787467921685,
+      "tag": "0000_motionless_stryfe",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1787468097454,
+      "tag": "0001_ordinary_morlun",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1787477067351,
+      "tag": "0002_vengeful_war_machine",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1787486974095,
+      "tag": "0003_amazing_hydra",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1787556523403,
+      "tag": "0004_polite_forge",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "5",
+      "when": 1787569037936,
+      "tag": "0005_tranquil_psylocke",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "5",
+      "when": 1787574225550,
+      "tag": "0006_outstanding_hulk",
+      "breakpoints": true
+    }
+  ]
+}

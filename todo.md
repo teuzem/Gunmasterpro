@@ -1,0 +1,203 @@
+# Project TODO
+
+- [x] Porter la structure visuelle et la navigation du storefront GunsMasterPro validé.
+- [x] Installer le favicon autorisé fourni par le propriétaire.
+- [x] Créer le schéma Manus des produits, catégories et références média.
+- [x] Appliquer la migration de base de données Manus.
+- [x] Importer les 239 produits avec les prix validés, les descriptions et les caractéristiques.
+- [x] Confirmer les prix de 1 500 € pour les références source 9539 et 9591.
+- [x] Vérifier dans la base Manus les descriptions, caractéristiques et prix persistés des 239 produits.
+- [x] Exposer le catalogue persistant par des procédures tRPC publiques.
+- [x] Afficher les données persistées avec les états de chargement, vide et erreur.
+- [x] Enregistrer les références média autorisées dans la base Manus.
+- [x] Préparer un import de médias Drive vers Manus Storage par lots reprenables.
+- [x] Afficher un repli explicite et non bloquant pour les médias non transférés.
+- [x] Transférer et rattacher le lot Drive 001 de 28 médias autorisés pour les produits 9539 et 9591.
+- [x] Transférer et rattacher le lot Drive 002 de 8 médias autorisés pour les produits 3203 et 3209.
+- [x] Transférer et rattacher le lot Drive 003 de 8 médias autorisés pour les produits 3250 et 3260.
+- [x] Transférer et rattacher le lot Drive 004 de 8 médias autorisés pour les produits 3266 et 3274.
+- [x] Transférer et rattacher le lot Drive 005 de 10 médias autorisés pour le produit 3300.
+- [x] Transférer et rattacher le lot Drive 006 de 2 médias autorisés pour le produit 3361.
+- [x] Transférer et rattacher le lot Drive 007 de 9 médias autorisés pour les produits 3367, 3375 et 3387.
+- [x] Transférer et rattacher le lot Drive 008 de 9 médias autorisés pour les produits 3393 et 3409.
+- [x] Transférer et rattacher le lot Drive 009 de 12 médias autorisés pour les produits 3412, 3415 et 3418.
+- [x] Transférer et rattacher le lot Drive 010 de 16 médias autorisés pour les produits 3421, 3488 et 3499.
+- [x] Transférer et rattacher le lot Drive 011 de 28 médias autorisés pour les produits 3513, 3523 et 3548.
+- [x] Transférer et rattacher le lot Drive 012 de 12 médias autorisés pour les produits 3551, 3580 et 3588.
+- [x] Transférer et rattacher le lot Drive 013 de 9 médias autorisés pour les produits 3591, 3594 et 3597.
+- [x] Transférer et rattacher le lot Drive 014 de 10 médias autorisés pour les produits 3600, 3603 et 3606.
+- [x] Transférer et rattacher le lot Drive 015 de 17 médias autorisés pour les produits 3619, 3635 et 3638.
+- [x] Transférer et rattacher le lot Drive 016 de 17 médias autorisés pour les produits 3654, 3674 et 3679.
+- [x] Transférer et rattacher le lot Drive 017 de 17 médias autorisés pour les produits 3696, 3723 et 3737.
+- [x] Transférer et rattacher le lot Drive 018 de 12 médias autorisés pour les produits 3753, 3770 et 3786.
+- [x] Transférer et rattacher le lot Drive 019 de 14 médias autorisés pour les produits 3795, 3862 et 3872.
+- [x] Transférer et rattacher le lot Drive 020 de 18 médias autorisés pour les produits 3882, 3895 et 3905.
+- [x] Transférer et rattacher le lot Drive 021 de 12 médias autorisés pour les produits 3919, 3964 et 3982.
+- [x] Transférer et rattacher le lot Drive 022 de 16 médias autorisés pour les produits 3990, 4001 et 4010.
+- [x] Transférer et rattacher le lot Drive 023 repris de 12 médias autorisés pour les produits 4019 et 4050.
+- [x] Transférer et rattacher le lot Drive 024 de 20 médias autorisés pour les produits 4108, 4169 et 4221.
+- [x] Transférer et rattacher le lot Drive 025 de 19 médias autorisés pour les produits 4497, 4524 et 4572.
+- [x] Transférer et rattacher le lot Drive 026 de 19 médias autorisés pour les produits 4592, 4597 et 4600.
+- [x] Transférer et rattacher le lot Drive 027 de 13 médias autorisés pour les produits 4603, 4630 et 4650.
+- [x] Transférer et rattacher le lot Drive 028 de 29 médias autorisés pour les produits 4697, 4700 et 4739.
+- [x] Transférer et rattacher le lot Drive 029 de 26 médias autorisés pour les produits 4763, 4783 et 4844.
+- [x] Transférer et rattacher le lot Drive 030 de 28 médias autorisés pour les produits 4865, 4875 et 4899.
+- [x] Transférer et rattacher le lot Drive 031 de 17 médias autorisés pour les produits 4928, 4938 et 4941.
+- [x] Transférer et rattacher le lot Drive 032 de 19 médias autorisés pour les produits 4962, 4969 et 4992.
+- [x] Transférer et rattacher le lot Drive 033 de 34 médias autorisés pour les produits 5022, 5025 et 5059.
+- [x] Transférer et rattacher le lot Drive 034 de 13 médias autorisés pour les produits 5153, 5163 et 5169.
+- [x] Transférer et rattacher le lot Drive 035 repris de 37 médias uniques pour les produits 5176, 5206 et 5225.
+- [x] Transférer et rattacher le lot Drive 036 de 14 médias autorisés pour les produits 5263, 5280 et 5283.
+- [x] Transférer et rattacher le lot Drive 037 de 43 médias autorisés pour les produits 5295, 5337 et 5363.
+- [x] Transférer et rattacher le lot Drive 038 de 53 médias autorisés pour les produits 5382, 5408 et 5485.
+- [x] Transférer et rattacher le lot Drive 039 de 38 médias autorisés pour les produits 5497, 5599 et 5681.
+- [x] Transférer et rattacher le lot Drive 040 de 22 médias autorisés pour les produits 5704, 5727 et 5738.
+- [x] Transférer et rattacher le lot Drive 041 de 49 médias autorisés pour les produits 5783, 5791 et 5811.
+- [x] Transférer et rattacher le lot Drive 042 de 28 médias autorisés pour les produits 5847, 5870 et 5886.
+- [x] Transférer et rattacher le lot Drive 043 de 20 médias autorisés pour les produits 5897, 5905 et 5919.
+- [x] Transférer et rattacher le lot Drive 044 de 48 médias autorisés pour les produits 5934, 5944 et 6003.
+- [x] Transférer et rattacher le lot Drive 045 de 33 médias autorisés pour les produits 6031, 6060 et 6116.
+- [x] Transférer et rattacher le lot Drive 046 de 17 médias autorisés pour les produits 6202, 6209 et 6220.
+- [x] Transférer et rattacher le lot Drive 047 de 29 médias autorisés pour les produits 6229, 6272 et 6348.
+- [x] Transférer et rattacher le lot Drive 048 de 19 médias autorisés pour les produits 6396, 6406 et 6414.
+- [x] Transférer et rattacher le lot Drive 049 de 37 médias autorisés pour les produits 6446, 6506 et 6806.
+- [x] Transférer et rattacher le lot Drive 050 de 20 médias autorisés pour les produits 6819, 6830 et 6841.
+- [x] Transférer et rattacher le lot Drive 051 de 23 médias autorisés pour les produits 6850, 6860 et 6984.
+- [x] Transférer et rattacher le lot Drive 052 de 20 médias autorisés pour les produits 7042, 7054 et 7072.
+- [x] Transférer et rattacher le lot Drive 053 de 38 médias autorisés pour les produits 7076, 7121 et 7147.
+- [x] Transférer et rattacher le lot Drive 054 de 25 médias autorisés pour les produits 7212, 7320 et 7329.
+- [x] Transférer et rattacher le lot Drive 055 de 32 médias autorisés pour les produits 7376, 7391 et 7405.
+- [x] Transférer et rattacher le lot Drive 056 de 33 médias autorisés pour les produits 7457, 7490 et 7504.
+- [x] Transférer et rattacher le lot Drive 057 de 48 médias autorisés pour les produits 7519, 7546 et 7559.
+- [x] Transférer et rattacher le lot Drive 058 de 45 médias autorisés pour les produits 7600, 7636 et 7676.
+- [x] Transférer et rattacher le lot Drive 059 de 38 médias autorisés pour les produits 7698, 7739 et 7769.
+- [x] Transférer et rattacher le lot Drive 060 de 44 médias autorisés pour les produits 7784, 7804 et 7820.
+- [x] Transférer et rattacher le lot Drive 061 de 27 médias autorisés pour les produits 7925, 7953 et 7965.
+- [x] Transférer et rattacher le lot Drive 062 de 32 médias autorisés pour les produits 7997, 8013 et 8039.
+- [x] Transférer et rattacher le lot Drive 063 de 31 médias autorisés pour les produits 8052, 8080 et 8112.
+- [x] Transférer et rattacher le lot Drive 064 de 33 médias autorisés pour les produits 8125, 8189 et 8252.
+- [x] Transférer et rattacher le lot Drive 065 de 30 médias autorisés pour les produits 8261, 8377 et 8393.
+- [x] Transférer et rattacher le lot Drive 066 de 28 médias autorisés pour les produits 8407, 8432 et 8473.
+- [x] Transférer et rattacher le lot Drive 067 de 35 médias autorisés pour les produits 8494, 8508 et 8524.
+- [x] Transférer et rattacher le lot Drive 068 de 27 médias autorisés pour les produits 8541, 8554 et 8567.
+- [x] Transférer et rattacher le lot Drive 069 de 38 médias autorisés pour les produits 8578, 8591 et 8639.
+- [x] Transférer et rattacher le lot Drive 070 de 43 médias autorisés pour les produits 8660, 8682 et 8701.
+- [x] Transférer et rattacher le lot Drive 071 de 33 médias autorisés pour les produits 8735, 8766 et 8776.
+- [x] Transférer et rattacher le lot Drive 072 de 46 médias autorisés pour les produits 8800, 8828 et 8852.
+- [x] Transférer et rattacher le lot Drive 073 de 28 médias autorisés pour les produits 8872, 8892 et 8908.
+- [x] Transférer et rattacher le lot Drive 074 de 58 médias autorisés pour les produits 8922, 8944 et 8967.
+- [x] Transférer et rattacher le lot Drive 075 de 44 médias autorisés pour les produits 8989, 9066 et 9101.
+- [x] Transférer et rattacher le lot Drive 076 de 25 médias autorisés pour les produits 9129, 9134 et 9141.
+- [x] Transférer et rattacher le lot Drive 077 de 65 médias autorisés pour les produits 9145, 9180 et 9255.
+- [x] Transférer et rattacher le lot Drive 078 de 32 médias autorisés pour les produits 9290, 9319 et 9367.
+- [x] Transférer et rattacher le lot Drive 079 de 53 médias autorisés pour les produits 9405, 9428 et 9443.
+- [x] Transférer et rattacher le lot Drive 080 de 32 médias autorisés pour les produits 9493 et 9522.
+- [x] Valider un importateur direct Drive vers Manus Storage avec migration SQL transactionnelle par lot.
+- [x] Prévalider la correspondance des dossiers Drive avec les fiches catalogue avant tout téléversement et documenter le dossier orphelin 4034.
+- [x] Dédupliquer les fichiers Drive répétés avant téléversement et reprendre le lot 035 affecté par le dossier 5206.
+- [x] Appliquer et vérifier la résolution documentée des 9 références média sans dossier Drive manifeste pour les produits 22, 47 et 66.
+- [x] Continuer la migration uniquement par lots manuels contrôlés et validés en base après chaque transfert.
+- [x] Ajouter et exécuter des tests Vitest du catalogue et du repli média.
+- [x] Corriger les erreurs TypeScript restantes avant la validation de production.
+- [x] Vérifier visuellement le storefront aux formats bureau et mobile et consigner les résultats.
+- [x] Créer un checkpoint du projet complet afin de permettre la publication.
+- [x] Auditer les archives de visuels hero et catégories, puis constituer un manifeste de correspondance exploitable.
+- [x] Importer les visuels fournis vers Manus Storage et persister leurs références dans la base de données.
+- [x] Mettre à jour le hero carousel et les cartes catégories de l’accueil avec les médias importés et des états de repli.
+- [x] Auditer les tables, procédures tRPC et contrôles d’accès nécessaires aux parcours applicatifs persistants et authentifiés.
+- [x] Concevoir puis appliquer les extensions de schéma nécessaires sans dupliquer les capacités Manus OAuth existantes.
+- [x] Identifier, par produit, les champs de spécification incomplets ou assimilables à des placeholders dans le catalogue.
+- [ ] Enrichir les spécifications produit uniquement à partir de sources vérifiables et consigner les exceptions non confirmables.
+- [x] Ajouter des tests de persistance, autorisation et données catalogue.
+- [ ] Finaliser la validation du storefront après audit complet des widgets et overlays restant en clair/sombre, recherche interactive et parcours d’administration authentifié.
+- [x] Identifier les dix premiers produits sans image exploitable et documenter leurs sources média admissibles.
+- [x] Rattacher pour les dix premiers produits un média principal transféré depuis une source publique traçable, avec attribution et statut de droits conservés.
+- [ ] Compléter, lorsque des sources supplémentaires explicitement licenciées et correspondant à la variante existent, les galeries des dix premiers produits.
+- [x] Vérifier et persister explicitement une attribution exploitable pour les médias principaux transférés des produits Glock 17 Gen5, SIG Sauer P226 Legion et Beretta 92FS.
+- [x] Revalider en base les dix produits prioritaires avec leur source média, attribution et statut de droits.
+- [x] Ajouter des procédures tRPC réservées aux administrateurs pour consulter et modérer les avis soumis.
+- [x] Ajouter des procédures tRPC réservées aux administrateurs pour consulter les demandes et enregistrer leurs changements de statut.
+- [ ] Finaliser et valider l’interface d’administration authentifiée pour la modération des avis et le suivi des demandes.
+- [x] Corriger l’occupation d’espace de la navigation d’administration au format mobile afin de préserver la largeur de lecture.
+- [ ] Valider visuellement `/administration` avec une session administrateur authentifiée, sur bureau et mobile, y compris les états vides et les actions de traitement.
+- [x] Ajouter la persistance et la consultation administrateur des audits de caractéristiques produit confirmées par source.
+- [x] Reproduire et consigner les défauts visuels de navigation, recherches, catégories, fiches produit et popups sur bureau et mobile.
+- [x] Corriger l’affichage des images de catégories lorsque les médias vérifiés sont disponibles.
+- [x] Empêcher les titres, noms de produit et contenus longs de déborder sur les fiches, popups et petits écrans.
+- [x] Recomposer le header afin de supprimer les débordements, le défilement horizontal et la surdimension du logo/nom de site.
+- [x] Harmoniser les panneaux d’achat, le panier et les contrôles de navigation vérifiés en thèmes clair et sombre.
+- [x] Finaliser l’audit exhaustif et consigné des prompts, actions d’achat, recherche, panier, menus et lightboxes présents dans le storefront.
+- [x] Revalider le prompt newsletter et le menu mobile dans les deux thèmes à partir du journal d’audit finalisé.
+- [x] Supprimer la clé `galleryAttributions` des données de fiches produit, des sources applicatives et de la base lorsque présente.
+- [x] Valider sur mobile, en clair et sombre, la réduction et la contrainte des titres de fiches produit avant de clôturer ce correctif.
+- [x] Permettre, uniquement en développement, de masquer le prompt de langue pendant les captures de validation ciblées.
+- [x] Effectuer une passe de finition typographique, d’espacement et de contraste sur les contenus du storefront en thèmes clair et sombre.
+- [x] Finaliser et démontrer le référencement technique avancé, les métadonnées de pages et les données structurées du catalogue sur toutes les routes publiques.
+- [x] Démontrer le rendu serveur des routes publiques avec métadonnées canoniques, Open Graph, Twitter, statuts HTTP et pages privées non indexables.
+- [x] Publier un sitemap XML dynamique et un robots.txt relié au domaine canonique, incluant les pages publiques et le catalogue.
+- [x] Ajouter des données structurées JSON-LD Organization, WebSite, BreadcrumbList et Product/Offer fondées sur les données catalogue persistées.
+- [x] Corriger et vérifier le contenu métier SSR de l’accueil, puis automatiser le contrôle de body et balises des pages publiques et privées.
+- [x] Vérifier le dépôt GitHub sélectionné, y synchroniser les changements validés et créer un commit descriptif sur la branche non destructive `manus/seo-ui-finalization`.
+- [x] Vérifier la configuration Netlify demandée et préparer une publication externe compatible après confirmation explicite de l’opération de déploiement.
+- [ ] Publier la livraison validée sur la cible confirmée `gunsmasterpro.netlify.app`, contrôler son fonctionnement public, puis retirer le site Netlify redondant `gunmasterpro`.
+- [x] Réconcilier la livraison validée avec la branche GitHub `main` sans écrasement, puis documenter les variables requises pour un déploiement Netlify sur un compte crédité.
+- [x] Corriger les règles de largeur, d’empilement et de défilement du popup de recherche et des panneaux superposés.
+- [x] Effectuer une dernière validation interactive des overlays de recherche sur desktop et mobile avec saisie et sélection de résultat.
+- [x] Vérifier visuellement chaque correction sur les routes d’accueil, catégorie, fiche produit, recherche et panier.
+- [x] Documenter et vérifier page par page la finition typographique, l’espacement et le contraste des contenus publics restants en clair et sombre, avec les exceptions éventuelles.
+- [x] Vérifier en clair et sombre les routes publiques restantes `/a-propos`, `/mentions-legales`, `/conformite` et une catégorie représentative, puis compléter la table de finition route par route.
+- [x] Vérifier en clair et sombre les familles de catégories restantes `/categorie/rifles`, `/categorie/shotguns` et `/categorie/accessories`, puis compléter la matrice publique de finition.
+- [x] Retirer des fiches produit les mentions techniques de droits média demandées, sans supprimer les données internes de provenance nécessaires.
+- [x] Définir et appliquer le schéma persistant des paramètres de contact, préférences de confidentialité, journaux d’activité et localisations approximatives consenties.
+- [x] Ajouter des procédures administrateur sécurisées pour CRUD catalogue, catégories, utilisateurs, statut de compte, paramètres de contact et consultation des données de géolocalisation consenties.
+- [x] Construire un espace d’administration central responsive clair/sombre avec indicateurs, catalogue, utilisateurs, paramètres de contact et vues d’activité.
+- [x] Intégrer une géolocalisation approximative sans clé avec pays, région, ville et coordonnées, déclenchée seulement après consentement, avec conservation limitée et possibilité d’opposition.
+- [x] Ajouter des tests d’accès, de persistance et de confidentialité pour l’administration centrale et les données de localisation.
+- [x] Diagnostiquer puis corriger les mutations administratives dont l’enregistrement persistant échoue ou ne se reflète pas dans l’interface.
+- [x] Enregistrer un historique consenti des connexions et localisations approximatives par visiteur ou utilisateur, sans conserver l’adresse IP brute.
+- [x] Persister et centraliser les événements de demande, panier, inscription newsletter et opérations administratives pour le suivi détaillé des workflows.
+- [x] Ajouter un flux d’upload Manus Storage avec prévisualisation, galerie organisée, édition et suppression d’assets protégés par les droits administrateur.
+- [x] Étendre les vues d’administration des utilisateurs, demandes, paniers, newsletter, activité et médias avec données réelles, recherches, filtres et états vides.
+- [x] Tester de bout en bout les sauvegardes, l’historique consenti, les médias et l’actualisation des vues d’administration.
+- [x] Mettre en place et vérifier l’actualisation automatique des vues administratives à partir des événements persistés, sans processus serveur permanent.
+- [x] Corriger la divergence d’hydratation SSR/client et vérifier l’absence d’erreur React après chargement initial et navigation authentifiée.
+- [x] Corriger la mutation catalogue qui transmet un identifiant de produit absent ou incompatible avec le contrat `productId`, puis couvrir sa sauvegarde par test.
+- [x] Agrandir la recherche catalogue administrateur et y intégrer suggestions instantanées, autocomplétion, surlignage et sélection clavier vers l’éditeur produit.
+- [x] Restaurer les actions CRUD de catégories dans la console après l’audit de la réécriture de recherche.
+- [x] Ajouter des rôles `super_admin`, `admin` et une demande d’accès administrateur persistante avec audit d’approbation.
+- [x] Réserver la gestion des utilisateurs et l’approbation des administrateurs au seul super-administrateur côté serveur et interface.
+- [x] Créer le parcours sécurisé de demande d’accès administrateur puis la console d’approbation/refus du super-administrateur.
+- [x] Vérifier par tests que les administrateurs approuvés peuvent gérer l’opérationnel sans pouvoir gérer les utilisateurs ni les administrateurs.
+- [x] Diagnostiquer la demande administrateur réelle créée et la rendre visible immédiatement dans la gouvernance super-administrateur.
+- [x] Permettre au super-administrateur d’approuver, révoquer, rétrograder ou promouvoir les administrateurs avec protections et audit serveur.
+- [x] Valider le workflow sur la demande réelle sans perdre les comptes ni les droits existants.
+- [x] Ajouter des exports super-administrateur du catalogue complet en CSV, JSON et XLSX formaté avec filtres et largeurs adaptées.
+- [x] Fournir un modèle XLSX d’import prérempli avec deux produits réels ou exemples conformes au schéma catalogue.
+- [x] Ajouter un import en masse super-administrateur par glisser-déposer avec prévalidation complète, rapport d’erreurs et écriture persistante.
+- [x] Valider visuellement et par tests les exports/imports dans les thèmes clair et sombre sans modifier le catalogue hors action confirmée.
+
+- [x] Corriger les liens Telegram pour cibler directement le pseudo configuré, centraliser les URL WhatsApp/Telegram, synchroniser les paramètres publics en temps réel et couvrir le comportement par tests.
+
+- [x] Harmoniser la marque dans les thèmes clair et sombre sur le storefront et les pop-ups, puis faire défiler automatiquement toute la galerie dans les mini-cartes du résumé de commande.
+
+- [x] Ajouter un aperçu rapide par œil dans les mini-cartes de commande avec galerie complète, modale refermable, informations rapides et harmonisation des boutons/badges entre thèmes.
+
+- [x] Corriger les overlays du thème clair qui héritaient de couleurs sombres, renforcer la typographie desktop, harmoniser les surfaces et reformuler les titres, filtres et paragraphes génériques du catalogue et du hero en français, anglais et allemand.
+
+- [x] Harmoniser les badges de catégorie et de prix des cartes produit, les logos header/footer/pop-ups, les sections homepage et les éléments newsletter avec la palette claire ; vérifier les couleurs calculées et le rendu catalogue/accueil.
+
+- [x] Corriger définitivement les dernières héritages sombres du logo dans les pop-ups clairs, renforcer les titres du résumé/aperçu et masquer les scrollbars natives tout en conservant le défilement tactile et clavier.
+
+- [x] Contextualiser les titres et sous-titres du catalogue en armurerie dans les trois langues, remplacer les formulations génériques des avis et justifier harmonieusement les paragraphes éditoriaux concernés.
+
+- [x] Centrer le hero catalogue, maîtriser son titre sur deux lignes, conserver un sous-titre lisible, et compacter le titre du widget de filtres sur mobile pour une composition en deux lignes équilibrées.
+
+- [x] Uniformiser le responsive mobile des titres, sous-titres et en-têtes de sections sur l’accueil, catalogue, aide, à-propos, conformité, conditions, confidentialité, mentions légales, avis, comparaison, conseiller et modules de pied de page.
+
+- [x] Supprimer la justification génératrice de vides dans l’eyebrow et le titre de la hero catalogue, recentrer les libellés et appliquer les mêmes garde-fous de largeur sur mobile et desktop.
+
+- [x] Corriger les héritages de palette sombre dans le popup de vérification d’âge, son overlay, le curseur natif du prix et les contrôles checkbox/radio du filtre en thème clair ; vérifier visuellement et techniquement.
+
+- [x] Réparer la composition du filtre catalogue : titre compact et équilibré, facettes resserrées, contenus contenus sans débordement et défilement interne limité sur mobile, avec rendu clair cohérent.
+
+- [x] Ajouter un bouton fixe « Réinitialiser la sélection » en bas du panneau de filtres, cohérent dans les deux thèmes, et maintenir le titre de l’aperçu rapide sur une seule ligne avec troncature élégante si nécessaire.

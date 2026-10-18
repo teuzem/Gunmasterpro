@@ -1,0 +1,22 @@
+[build]
+  base = "."
+  command = "pnpm run build:netlify"
+  publish = "dist/public"
+  functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "22"
+  PNPM_VERSION = "10.4.1"
+  STATIC_DIR = "dist/public"
+  CANONICAL_ORIGIN = "https://gunmaster-pro.com"
+  SITE_NAME = "GunsMasterPro"
+
+[functions]
+  node_bundler = "esbuild"
+  included_files = ["dist/public/**", "dist/server-ssr/**"]
+
+[[redirects]]
+  from = "/*"
+  to = "/.netlify/functions/app/:splat"
+  status = 200
+  force = true

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="640" viewBox="0 0 800 640" role="img" aria-label="GunsMasterPro — visuel en cours de vérification">
+  <rect width="800" height="640" fill="#101a22"/>
+  <rect x="24" y="24" width="752" height="592" rx="24" fill="none" stroke="#d7b46a" stroke-opacity="0.35" stroke-width="2" stroke-dasharray="10 8"/>
+  <circle cx="400" cy="250" r="72" fill="none" stroke="#d7b46a" stroke-width="6"/>
+  <circle cx="400" cy="250" r="30" fill="none" stroke="#d7b46a" stroke-width="4"/>
+  <line x1="400" y1="250" x2="452" y2="198" stroke="#d7b46a" stroke-width="6" stroke-linecap="round"/>
+  <text x="400" y="380" text-anchor="middle" font-family="Georgia, serif" font-size="44" letter-spacing="6" fill="#e5c97f">GUNSMASTERPRO</text>
+  <text x="400" y="428" text-anchor="middle" font-family="Arial, sans-serif" font-size="24" fill="#94a3b8">Visuel en cours de vérification</text>
+  <text x="400" y="464" text-anchor="middle" font-family="Arial, sans-serif" font-size="20" fill="#64748b">Image under review · Bild wird geprüft · 18+</text>
+</svg>

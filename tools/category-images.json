@@ -1,0 +1,232 @@
+{
+  "accessories": {
+    "slug": "accessories",
+    "file": "Accessories.webp",
+    "key": "categories/accessories_fe94b7ee.webp",
+    "url": "/manus-storage/categories/accessories_fe94b7ee.webp",
+    "contentType": "image/webp",
+    "bytes": 29138,
+    "sha256": "4765491f4fbc02efa80a8c581fab6c7b1915521ddee678d2c234d6a2f5de461e",
+    "reused": true
+  },
+  "black-powder-muzzleloaders": {
+    "slug": "black-powder-muzzleloaders",
+    "file": "Black Powder And Muzzleloaders.webp",
+    "key": "categories/black-powder-muzzleloaders_590c5586.webp",
+    "url": "/manus-storage/categories/black-powder-muzzleloaders_590c5586.webp",
+    "contentType": "image/webp",
+    "bytes": 12364,
+    "sha256": "805b0fce6e2f89f84bfb054b98fe2f35d1c83323062858f5fa146ff542f38904",
+    "reused": true
+  },
+  "bolt-action-rifles": {
+    "slug": "bolt-action-rifles",
+    "file": "Bolt Action Rifles.webp",
+    "key": "categories/bolt-action-rifles_7df60ec3.webp",
+    "url": "/manus-storage/categories/bolt-action-rifles_7df60ec3.webp",
+    "contentType": "image/webp",
+    "bytes": 10222,
+    "sha256": "fc8fecbdf885c6ec7818b4084cc71d81a7c10f1495863ca60612b08c0a13f3c4",
+    "reused": true
+  },
+  "collectible-firearms": {
+    "slug": "collectible-firearms",
+    "file": "Collectible Firearms.webp",
+    "key": "categories/collectible-firearms_728ac768.webp",
+    "url": "/manus-storage/categories/collectible-firearms_728ac768.webp",
+    "contentType": "image/webp",
+    "bytes": 17074,
+    "sha256": "f2ee568ae3904b282e4b21719d26f0bf045b79e1d10cd3564d5a4081e72bf477",
+    "reused": true
+  },
+  "lever-action-rifles": {
+    "slug": "lever-action-rifles",
+    "file": "Lever Action Rifles.webp",
+    "key": "categories/lever-action-rifles_5f244803.webp",
+    "url": "/manus-storage/categories/lever-action-rifles_5f244803.webp",
+    "contentType": "image/webp",
+    "bytes": 13600,
+    "sha256": "528f8b4341ec3d7672eff09f5859903d64e4d99f0bc81b9f2a22939816dc512a",
+    "reused": true
+  },
+  "magazines": {
+    "slug": "magazines",
+    "file": "Magazines.webp",
+    "key": "categories/magazines_f44bb100.webp",
+    "url": "/manus-storage/categories/magazines_f44bb100.webp",
+    "contentType": "image/webp",
+    "bytes": 12410,
+    "sha256": "09e7de1b19d6ff3f689520b3f3c9208d6729ae9e8ff2c9f484602b906c4e50b0",
+    "reused": true
+  },
+  "optics": {
+    "slug": "optics",
+    "file": "Optics.webp",
+    "key": "categories/optics_9d4df20a.webp",
+    "url": "/manus-storage/categories/optics_9d4df20a.webp",
+    "contentType": "image/webp",
+    "bytes": 18736,
+    "sha256": "38b8a89955f2196f6a6cea79d1bb39521d34ed1a9978faf0b3478f0807ebd721",
+    "reused": true
+  },
+  "other-accessories": {
+    "slug": "other-accessories",
+    "file": "Other Accessories.webp",
+    "key": "categories/other-accessories_5a247c1b.webp",
+    "url": "/manus-storage/categories/other-accessories_5a247c1b.webp",
+    "contentType": "image/webp",
+    "bytes": 23320,
+    "sha256": "1fb1ee9d738dfbdd766e7f0e689ec671d22f685a073b79ef7ef4b75186313cd3",
+    "reused": true
+  },
+  "other-handguns": {
+    "slug": "other-handguns",
+    "file": "Other Handguns.webp",
+    "key": "categories/other-handguns_052b443b.webp",
+    "url": "/manus-storage/categories/other-handguns_052b443b.webp",
+    "contentType": "image/webp",
+    "bytes": 20490,
+    "sha256": "828d8a72d209e01ae38c6bea80feaad15899227424035b2157d8366c4b5ac56f",
+    "reused": true
+  },
+  "other-rifles": {
+    "slug": "other-rifles",
+    "file": "Other Rifles.webp",
+    "key": "categories/other-rifles_56173df5.webp",
+    "url": "/manus-storage/categories/other-rifles_56173df5.webp",
+    "contentType": "image/webp",
+    "bytes": 28316,
+    "sha256": "1b3a0bbc580744906dc4476802915f34f884c5fb4442ef9adec53d740c906ee8",
+    "reused": true
+  },
+  "other-shotguns": {
+    "slug": "other-shotguns",
+    "file": "Other Shotguns.webp",
+    "key": "categories/other-shotguns_dd3dff1a.webp",
+    "url": "/manus-storage/categories/other-shotguns_dd3dff1a.webp",
+    "contentType": "image/webp",
+    "bytes": 3874,
+    "sha256": "0a323a5460363c8eafd3ea2f5a48e9e4ad19870772a171c0f9e986aeef148e84",
+    "reused": true
+  },
+  "over-under-shotguns": {
+    "slug": "over-under-shotguns",
+    "file": "Over Under Shotguns.webp",
+    "key": "categories/over-under-shotguns_302d68c9.webp",
+    "url": "/manus-storage/categories/over-under-shotguns_302d68c9.webp",
+    "contentType": "image/webp",
+    "bytes": 15066,
+    "sha256": "0d393ce29a545a53c7774a54746250571715dd053fae9599358a617fa0336b77",
+    "reused": true
+  },
+  "pump-action-rifles": {
+    "slug": "pump-action-rifles",
+    "file": "Pump Action Rifles.webp",
+    "key": "categories/pump-action-rifles_fa118194.webp",
+    "url": "/manus-storage/categories/pump-action-rifles_fa118194.webp",
+    "contentType": "image/webp",
+    "bytes": 7588,
+    "sha256": "38c7a6935705c72e0ca6a34cd50c0a68761e2a715d7aa0481572bbc4af0dcac5",
+    "reused": true
+  },
+  "pump-action-shotguns": {
+    "slug": "pump-action-shotguns",
+    "file": "Pump Action Shotguns.webp",
+    "key": "categories/pump-action-shotguns_0348951e.webp",
+    "url": "/manus-storage/categories/pump-action-shotguns_0348951e.webp",
+    "contentType": "image/webp",
+    "bytes": 12918,
+    "sha256": "041de8cb768a0d6c45b9c4880317242c2589103c2ba42e41120f2fe5818e5edb",
+    "reused": true
+  },
+  "revolvers": {
+    "slug": "revolvers",
+    "file": "Revolvers.webp",
+    "key": "categories/revolvers_d5d57532.webp",
+    "url": "/manus-storage/categories/revolvers_d5d57532.webp",
+    "contentType": "image/webp",
+    "bytes": 102818,
+    "sha256": "a2a9835be2f81c86180d555513fb4a56a8f697fafec2367e209ba806d1794f9e",
+    "reused": true
+  },
+  "semi-auto-handguns": {
+    "slug": "semi-auto-handguns",
+    "file": "Semi Auto Handguns.webp",
+    "key": "categories/semi-auto-handguns_a0ebbf5c.webp",
+    "url": "/manus-storage/categories/semi-auto-handguns_a0ebbf5c.webp",
+    "contentType": "image/webp",
+    "bytes": 149540,
+    "sha256": "8a3156a1b0fc72f68ad2cf741fe05f11f79e167cd4396de2a86889d5a3c1308c",
+    "reused": true
+  },
+  "semi-auto-rifles": {
+    "slug": "semi-auto-rifles",
+    "file": "Semi Auto Rifles.webp",
+    "key": "categories/semi-auto-rifles_4de12ca4.webp",
+    "url": "/manus-storage/categories/semi-auto-rifles_4de12ca4.webp",
+    "contentType": "image/webp",
+    "bytes": 18042,
+    "sha256": "0a3777651e3f57c7c8ce67b3cf02a8490afc3c1c50901b7e96b95b8a203472a1",
+    "reused": true
+  },
+  "semi-auto-shotguns": {
+    "slug": "semi-auto-shotguns",
+    "file": "Semi Auto Shotguns.webp",
+    "key": "categories/semi-auto-shotguns_42587041.webp",
+    "url": "/manus-storage/categories/semi-auto-shotguns_42587041.webp",
+    "contentType": "image/webp",
+    "bytes": 10276,
+    "sha256": "bf2a1410c653b4ea6d81af7e3a84535867f24abb96dc6623771029b8ab28e010",
+    "reused": true
+  },
+  "side-by-side-shotguns": {
+    "slug": "side-by-side-shotguns",
+    "file": "Side by Side Shotguns.webp",
+    "key": "categories/side-by-side-shotguns_a380e5f6.webp",
+    "url": "/manus-storage/categories/side-by-side-shotguns_a380e5f6.webp",
+    "contentType": "image/webp",
+    "bytes": 582275,
+    "sha256": "27ee13e18d1f6084171680a75b1c46b1c0f8584f02a367112191e6a4a6a28239",
+    "reused": true
+  },
+  "single-shot-handguns": {
+    "slug": "single-shot-handguns",
+    "file": "Single Shot Handguns.jpg",
+    "key": "categories/single-shot-handguns_430ad4fd.jpg",
+    "url": "/manus-storage/categories/single-shot-handguns_430ad4fd.jpg",
+    "contentType": "image/jpeg",
+    "bytes": 301372,
+    "sha256": "4dd721f1efd2fc1efb0ab92ae37512f5f80d4866f204234bca2c6a0398345431",
+    "reused": true
+  },
+  "single-shot-rifles": {
+    "slug": "single-shot-rifles",
+    "file": "Single Shot Rifles.webp",
+    "key": "categories/single-shot-rifles_be517613.webp",
+    "url": "/manus-storage/categories/single-shot-rifles_be517613.webp",
+    "contentType": "image/webp",
+    "bytes": 5938,
+    "sha256": "18b7b03dfe6c882d392d0dc3dad070d210a7c015ae436efb8fba91421435e735",
+    "reused": true
+  },
+  "single-shot-shotguns": {
+    "slug": "single-shot-shotguns",
+    "file": "Single Shot Shotguns.webp",
+    "key": "categories/single-shot-shotguns_ee7e966b.webp",
+    "url": "/manus-storage/categories/single-shot-shotguns_ee7e966b.webp",
+    "contentType": "image/webp",
+    "bytes": 8706,
+    "sha256": "4f7c2e5c6824299731188914cf3f467ca28cbebf7cdfebb30167b078bd50e678",
+    "reused": true
+  },
+  "suppressors": {
+    "slug": "suppressors",
+    "file": "Suppressors.png",
+    "key": "categories/suppressors_8bb68fc7.png",
+    "url": "/manus-storage/categories/suppressors_8bb68fc7.png",
+    "contentType": "image/png",
+    "bytes": 193114,
+    "sha256": "1257a46172da60c336de398d6a54b7ecf48766d382631e001adf40a928cba54e",
+    "reused": true
+  }
+}
