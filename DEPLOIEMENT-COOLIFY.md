@@ -1,5 +1,9 @@
 # Déploiement GunsMasterPro — VPS Contabo + Coolify + domaine Hostinger
 
+> Besoin d'exécuter vite ? Utilisez **`DEPLOIEMENT-RAPIDE.md`** : uniquement les
+> étapes et les commandes, sans tableau, dans l'ordre d'exécution. Ce document
+> est la version détaillée, avec les justifications.
+
 **Domaine de production : `gunmaster-pro.com`.** Le nom est conforme à la règle
 LDH (lettres, chiffres, tirets), donc Let's Encrypt peut émettre un certificat et
 Coolify/Traefik peuvent router le domaine.
@@ -68,89 +72,6 @@ contrôle.
 > `categories/<slug>_<hash8>.<ext>`, `hero/<fichier>_<hash8>.<ext>`,
 > `catalogue/pakarms/<sourceId>/<n>_<hash8>.<ext>`. **Ne jamais introduire
 > d'espace ni de caractère accentué dans une clé.**
-
----
-
-## État SEO vérifié — et deux chantiers en attente
-
-### Ce qui est en place et vérifié
-
-- **Domaine** : `gunmaster-pro.com` partout (code, sitemap, robots, canoniques,
-  `.env.production.example`, `netlify.toml`, les deux guides).
-- **`sitemap.xml`** : 253 URL (14 pages + 239 fiches), jusqu'à 8 images par
-  produit, `lastmod` issu de `updatedAt` en base et non plus d'une date unique,
-  `changefreq`/`priority` différenciés.
-- **Résilience du sitemap** : il retombe sur le snapshot embarqué si MySQL est
-  injoignable. Un sitemap en 503 est traité comme une suppression par Google,
-  ce qui effacerait l'indexation au premier incident de base.
-- **`robots.txt`** : seul `/administration` est bloqué. Les pages privées
-  (`/panier`, `/favoris`, `/suivi`) ne sont plus `Disallow`, car une directive
-  `Disallow` empêche les robots de lire le `noindex` et empêche donc la
-  désindexation.
-- **Données structurées** (`client/src/ssr/prefetch.ts`) : `Organization`,
-  `WebSite` + `SearchAction`, `WebPage`, `Product` (offres, stock, galerie,
-  `additionalProperty` caliber/material/capacity/…), `BreadcrumbList`,
-  `ItemList`, `FAQPage` trilingue.
-
-### Sous-catégories : 14 catégories issues des données réelles
-
-Les 23 libellés par type d'action qui figuraient auparavant n'étaient adossés à
-**aucun produit** : `products.subCategory` contenait des valeurs sans lien
-(`original-imported`, `glock`, `beretta`, `223-bore`…), et aucune clé étrangère
-ne reliait les deux tables. Publier 23 pages dans cet état produisait 23 pages
-vides, donc du contenu mince — ce que les moteurs pénalisent.
-
-Mesures faites avant toute écriture (`tools/analyseSubcategories.mjs`,
-`tools/analyseFamilles.mjs`) :
-
-| Constat | Valeur |
-|---|---|
-| Catégories de l'export pakarms.co | **14** (basées marque/calibre) |
-| Données d'action (verrou, levier, pompe, superposé) | **absentes** : ni attribut, ni tag |
-| Sous-catégories par type d'action alimentées | **9 sur 23**, dont 4 avec 1–2 produits |
-| Revolver, mono-coup, levier, pompe, juxtaposé, superposé, modérateur, poudre noire, arme de collection | **0 produit** |
-
-La taxonomie publiée est donc celle des données : **14 catégories, toutes
-alimentées**, rattachées par la catégorie de source du produit (taxonomie
-pakarms.co), et non par déduction sur le nom. Les 15 produits sans catégorie de
-source sont affectés par des règles explicites et journalisées ; les 10 produits
-historiques hors export restent sans sous-catégorie et leurs anciennes valeurs
-libres ont été supprimées.
-
-| Catégorie | Famille | Produits |
-|---|---|---|
-| `original-imported` | Armes de poing | 38 |
-| `30-bore-7-shot-762mm` | Armes de poing | 29 |
-| `glock` | Armes de poing | 28 |
-| `beretta` | Armes de poing | 20 |
-| `assault-rifles` | Carabines | 23 |
-| `223-bore` | Carabines | 16 |
-| `heavy-machine-guns` | Carabines | 3 |
-| `12-bore` | Fusils | 8 |
-| `colt-1911` / `small-weapons` / `zigana` / `taurus` | Armes de poing | 11 / 11 / 10 / 3 |
-| `ammunition` | Accessoires | 9 |
-| `pistol-accessories` | Accessoires | 19 |
-
-Chaque catégorie a une page `/categorie/<slug>` : titre et description
-trilingues (FR/EN/DE), fil d'Ariane passant par la famille, `CollectionPage`
-avec `ItemList`, et un `og:image` pris parmi les visuels produits déjà
-téléversés. `tools/applySubcategories.mjs` **refuse d'écrire** une catégorie sans
-produit, et `server/subcategories.test.ts` fait échouer la suite si une
-catégorie vide ou un rattachement non déclaré réapparaît.
-
-> Les 23 visuels de `public/images categories` restent dans le bucket mais ne
-> correspondent plus à la taxonomie publiée (ils sont nommés par type d'action).
-> Ils ne sont plus référencés ; ils pourront servir si une taxonomie par type
-> d'action est alimentée un jour.
-
-### Chantier 1 — SEO international : URLs `/en/` et `/de/` (en attente)
-
-### Ce qui est volontairement absent
-
-Le `<meta name="keywords">` est conservé mais n'est plus utilisé comme levier :
-Google l'ignore depuis 2009. Les titres et descriptions sont produits **par page**
-à partir des données réelles (catégorie, marque, calibre, modèle) ; répéter un
-même lot de mots-clés sur toutes les pages est au contraire pénalisé.
 
 ---
 
@@ -475,42 +396,288 @@ Suite :
 
 ---
 
-## 7. Étape 6 — Source GitHub + webhook (re-déploiements automatiques)
+## 7. Étape 6 — Configuration complète de la ressource (onglet par onglet)
 
-1. Coolify → **Sources → New → GitHub App** → autoriser l'accès au dépôt (ou clé déploy privée en repli).
-2. Créez un **Project** `gunsmasterpro` → **New Resource → Docker Compose** :
-   - Source : votre dépôt, branche `main`
-   - Compose file : `docker-compose.coolify.yml`
-   - **Auto Deploy / Webhook : ON** → chaque `git push` sur `main` rebuild et redéploie seul. Si GitHub n'affiche pas le webhook : GitHub → repo → Settings → Webhooks → coller l'URL fournie par Coolify, événement `push`.
-3. Premier Deploy (bouton **Deploy**) — il échouera au preflight tant que l'étape 7 n'est pas faite : normal, passez à l'étape 7 puis **Redeploy**.
+La ressource est de type **Docker Compose** (`gunsmasterpro:main-…`). Chaque
+onglet de la page *Settings* est détaillé ci-dessous avec la valeur exacte à
+saisir.
+
+> **Pourquoi la ressource est « Exited ».** Deux causes cumulatives, toutes deux
+> corrigées dans le dépôt :
+> 1. **Le build échouait.** Le `Dockerfile` exécute `pnpm check && pnpm test &&
+>    pnpm build`. Deux tests d'intégration exigeaient une base MySQL, absente
+>    pendant le build : le build rouge, donc aucun conteneur. Ils sont désormais
+>    ignorés sans `DATABASE_URL` (`server/catalogueTransfer.integration.test.ts`).
+> 2. **Variables manquantes.** Le compose utilise `${DATABASE_URL:?…}` : si une
+>    variable obligatoire est absente, `docker compose config` échoue à la
+>    lecture et le conteneur ne démarre pas. Renseignez l'onglet
+>    **Environment Variables** *avant* tout déploiement.
+>
+> Un troisième frein a été levé : `public/` (992 Mo d'originaux déjà dans le
+> bucket) est désormais dans `.dockerignore`, sinon `COPY . .` envoyait 992 Mo au
+> démon Docker.
+
+### 7.1 Application details
+
+| Champ | Valeur |
+|---|---|
+| Name | `gunsmasterpro` |
+| Description | `Catalogue GunsMasterPro — SSR Node 22 + MySQL 8.4` |
+| Branch / Environment | `main` / `production` |
+
+### 7.2 Source (GitHub)
+
+| Champ | Valeur |
+|---|---|
+| Repository | votre dépôt GitHub |
+| Branch | `main` |
+| Build pack | `Dockerfile` |
+| Docker Compose location | `/docker-compose.coolify.yml` |
+| Build context | `/` (racine du dépôt) |
+
+### 7.3 Access
+
+| Champ | Valeur |
+|---|---|
+| Public access | **désactiver l'URL `sslip.io` générée automatiquement** |
+| Internal port | `3000` |
+
+> L'URL affichée par défaut
+> (`http://….169.58.10.224.sslip.io`) est un substitut automatique. Elle doit
+> être supprimée et remplacée par le domaine réel, sinon deux URLs servent le
+> même site et le SEO est scindé entre deux hôtes.
+>
+> `Manage Domains` → supprimer l'entrée `sslip.io` → ajouter `gunmaster-pro.com`
+> et `www.gunmaster-pro.com` (voir 7.9).
+
+### 7.4 Build pipeline
+
+| Champ | Valeur |
+|---|---|
+| Dockerfile | `/Dockerfile` |
+| Build context | `/` |
+| Build arguments | *(aucun)* |
+| Dockerfile target | *(laisser vide : le `CMD` final est déjà dans la dernière étape)* |
+
+Le build lance `pnpm check && pnpm test && pnpm build` : **un test en échec
+bloque la production**. C'est volontaire.
+
+### 7.5 Container image
+
+| Champ | Valeur |
+|---|---|
+| Image registry | aucune (build local) |
+| Port exposé | `3000` |
+
+### 7.6 Networking
+
+| Champ | Valeur |
+|---|---|
+| Port interne | `3000` |
+| Ports publiés | **aucun** — Traefik route via le réseau Coolify |
+| Alias réseau | `app` |
+
+Ne publiez jamais `3000` ni `3306` : le service doit rester sur le réseau privé
+Coolify, derrière Traefik.
+
+### 7.7 Runtime
+
+| Champ | Valeur |
+|---|---|
+| Restart policy | `unless-stopped` |
+| Health check path | `/healthz` |
+| Health check interval | `30s` |
+| Timeout | `5s` |
+| Retries | `3` |
+| Start period | `45s` |
+
+`/healthz` renvoie `{"ok":true,"service":"gunsmasterpro"}` et ne touche pas à la
+base : c'est bien le bon indicateur de « le conteneur répond ».
+
+### 7.8 Security
+
+| Champ | Valeur |
+|---|---|
+| Privileged | **non** |
+| Run as user | `node` (déjà défini dans le `Dockerfile`, ligne 31) |
+| Read-only root filesystem | non |
+
+Le conteneur tourne en `USER node` : le process n'a aucun privilège système.
+Ne jamais activer `privileged`.
+
+### 7.9 Domains
+
+| Champ | Valeur |
+|---|---|
+| Domain 1 | `gunmaster-pro.com` |
+| Domain 2 | `www.gunmaster-pro.com` |
+| Port | `3000` |
+| Path | `/` |
+| HTTPS | **ON** (Let's Encrypt) |
+| Force HTTPS | ON |
+| Let's Encrypt email | votre e-mail |
+
+Puis, dans **Environment Variables**, aligner `CANONICAL_ORIGIN` sur le domaine
+retenu (`https://gunmaster-pro.com`, sans `/` final). Le `preflight` refuse
+toute URL en `http://`.
+
+### 7.10 Environment Variables
+
+Les 5 premières variables sont **bloquantes** : `scripts/production-preflight.mjs`
+refuse le déploiement si l'une manque, si elle vaut `CHANGE_ME`, si
+`CANONICAL_ORIGIN` n'est pas en HTTPS, si `JWT_SECRET` fait moins de 32
+caractères, ou si `DATABASE_URL` n'est pas une URL `mysql://`.
+
+| Variable | Valeur | Obligatoire |
+|---|---|---|
+| `DATABASE_URL` | voir 7.12 | oui |
+| `JWT_SECRET` | voir 7.11 | oui |
+| `VITE_APP_ID` | identifiant applicatif, ex. `gunsmasterpro-prod` | oui |
+| `OAUTH_SERVER_URL` | `https://api.manus.im` | oui |
+| `CANONICAL_ORIGIN` | `https://gunmaster-pro.com` | oui (HTTPS) |
+| `OWNER_OPEN_ID` | identifiant du compte propriétaire | oui (compose) |
+| `OWNER_NAME` | `GunsMasterPro` | non |
+| `SITE_NAME` | `GunsMasterPro` | non |
+| `BUILT_IN_FORGE_API_URL` | `https://forge.manus.ai` | oui en production |
+| `BUILT_IN_FORGE_API_KEY` | clé Manus Storage | oui en production |
+| `NODE_ENV` / `PORT` / `HOST` | imposés par le compose | non |
+
+> **Les deux variables Forge ne sont pas optionnelles ici.** Elles servent le
+> proxy `/manus-storage/*`. Sans elles, le catalogue se replie sur
+> `/media-fallback.svg` et **aucun des 2 159 visuels téléversés n'est affiché**.
+> Reprenez ces valeurs depuis votre `.env` local ou depuis votre compte Manus —
+> ne les écrivez jamais dans le dépôt.
+
+Variables **sans** valeur (ne pas créer) : `MYSQL_PASSWORD`,
+`MYSQL_ROOT_PASSWORD`. Elles n'ont plus lieu d'être depuis que MySQL est une
+ressource Coolify gérée.
+
+### 7.11 Générer `JWT_SECRET`
+
+Dans un shell SSH :
+
+```bash
+openssl rand -hex 32
+```
+
+Collez les 64 caractères dans `JWT_SECRET`. Refaites-le si la valeur fuite :
+elle invalide toutes les sessions.
+
+### 7.12 Persistent Storage
+
+| Volume | Montage | Rôle |
+|---|---|---|
+| `gmp_media` | `/app/data/media` | uploads d'administration, hors bucket |
+
+Ce volume est **indispensable** : `LOCAL_MEDIA_DIR=/app/data/media` dans le
+compose. Sans lui, les médias téléversés depuis l'administration sont perdus à
+chaque redéploiement.
+
+### 7.13 Deployment lifecycle
+
+| Champ | Valeur |
+|---|---|
+| Auto deploy | **ON** via webhook GitHub (`main`) |
+| Health check | `/healthz` |
+| Wait for health check | **ON** (indispensable : le swap vers le nouveau conteneur ne doit avoir lieu que si le nouveau est sain) |
+| Start period | `45s` |
+| Grace period | `10s` |
+
+Les migrations sont **additives** : l'ancien conteneur continue de servir
+pendant le build. Lancez `pnpm db:deploy` **après** le swap, jamais avant.
+
+### 7.14 Advanced / Container labels
+
+Aucune label n'est nécessaire. Si vous ajoutez des labels, préfixez-les par
+`coolify.` pour éviter toute collision.
 
 ---
 
-## 8. Étape 7 — Variables d'environnement backend (onglet Environment de la ressource)
+## 8. Étape 7 — Créer la base MySQL comme ressource du projet
 
-Générez les secrets sur le VPS (jamais sur papier) :
+MySQL est une **ressource Coolify gérée**, et non un service du compose. Cela
+apporte une interface de gestion, des sauvegardes planifiées et un cycle de vie
+distinct de l'application.
 
-```bash
-openssl rand -hex 32   # JWT_SECRET (64 car.)
-openssl rand -hex 24   # MYSQL_PASSWORD (48 car.)
-openssl rand -hex 24   # MYSQL_ROOT_PASSWORD (48 car.)
+> **Le compose a été adapté** : le service `db` et le `depends_on` ont été
+> retirés de `docker-compose.coolify.yml`. Les laisser aurait produit un
+> `depends_on` vers un service inexistant, et le déploiement aurait échoué
+> immédiatement. Pensez à faire un `git push` pour que Coolify récupère cette
+> version.
+
+### 8.1 Créer la ressource
+
+Dans Coolify : **Project `production` → New Resource → Database → MySQL**.
+
+| Champ | Valeur | Raison |
+|---|---|---|
+| Name | `gunsmasterpro-db` | nom lisible dans le réseau |
+| Description | `Base GunsMasterPro` | — |
+| Image | `mysql:8.4` | **obligatoire** : `drizzle-orm/mysql-core` + `mysql2`. MySQL 8.0 minimum. |
+| Database name | `gunsmasterpro` | utilisé par `DATABASE_URL` |
+| User name | `gunsmasterpro` | utilisateur applicatif non-root |
+| Password | généré par Coolify, ou votre propre valeur | 24 caractères minimum |
+| Port | `3306` | — |
+| Public port | **aucun** | la base reste sur le réseau privé |
+| Database charset | `utf8mb4` | indispensable : les descriptions FR/EN/DE contiennent des accents et des emojis |
+| Collation | `utf8mb4_unicode_ci` | — |
+| SSL | désactivé en interne | le trafic ne sort pas du réseau Coolify |
+
+> **MariaDB et PostgreSQL sont incompatibles.** Le `preflight` refuse toute URL
+> qui n'est pas en `mysql://`, et le schéma Drizzle est construit sur
+> `mysql-core`. Ne créez pas de ressource Postgres « pour tester ».
+
+### 8.2 Volume et sauvegardes
+
+Coolify attache automatiquement un volume persistant. Vérifiez qu'il existe :
+
+| Champ | Valeur |
+|---|---|
+| Volume | créé automatiquement par Coolify (`/<projet>/mysql`) |
+| Sauvegardes | **ON** — planification quotidienne, rétention 7 jours minimum |
+
+Une sauvegarde planifiée est indispensable : elle est votre seule protection si
+une migration échoue. Le bouton *Backup now* permet de la tester immédiatement.
+
+### 8.3 Relever l'URL de connexion
+
+Une fois la ressource **déployée et saine**,Coolify affiche son URL interne,
+de la forme :
+
+```text
+mysql://gunsmasterpro:<PASSWORD>@<nom-du-service>:3306/gunsmasterpro
 ```
 
-| Variable | Valeur |
-|---|---|
-| `DATABASE_URL` | `mysql://gunsmasterpro:<MYSQL_PASSWORD>@db:3306/gunsmasterpro` (hôte `db` = service compose, réseau interne) |
-| `MYSQL_PASSWORD` | généré ci-dessus |
-| `MYSQL_ROOT_PASSWORD` | généré ci-dessus (différent) |
-| `JWT_SECRET` | généré ci-dessus (≥ 32 car., preflight refuse sinon) |
-| `VITE_APP_ID` | identifiant applicatif (ex. `gunsmasterpro-prod`) |
-| `OAUTH_SERVER_URL` | `https://api.manus.im` (ou votre fournisseur OAuth) |
-| `OWNER_OPEN_ID` / `OWNER_NAME` | compte propriétaire / `GunsMasterPro` |
-| `CANONICAL_ORIGIN` | `https://gunmaster-pro.com` (**HTTPS obligatoire**, preflight refuse sinon) |
-| `SITE_NAME` | `GunsmasterPro` |
-| `BUILT_IN_FORGE_API_URL` / `BUILT_IN_FORGE_API_KEY` | **requis en production** — sans eux, `/manus-storage/*` ne sert rien et le catalogue affiche le repli SVG (voir étape 8) |
-| `LOCAL_MEDIA_DIR` | `/app/data/media` (déjà câblé dans le compose ; volume `gmp_media`) |
+Recopiez-la telle quelle dans `DATABASE_URL` (onglet Environment Variables de
+l'application, voir 7.10). Deux pièges fréquents :
 
-> PostgreSQL est **incompatible** : `drizzle` + driver `mysql2` + preflight imposent `mysql://`. Ne créez pas de ressource Postgres pour cette app.
+- **le mot de passe contient des caractères spéciaux** (`@`, `#`, `/`, `:`) :
+  il doit être encodé en URL (`%40`, `%23`, `%2F`, `%3A`), sinon la connexion
+  est mal analysée et échoue sans message clair ;
+- **le nom d'hôte** est celui du service Coolify, pas `localhost` ni
+  `127.0.0.1` : l'application tourne dans un autre conteneur.
+
+Vérification depuis le conteneur de l'application (Coolify → Terminal, ou
+`docker exec`) :
+
+```bash
+# Résolution DNS du service MySQL.
+getent hosts <nom-du-service>
+
+# Connexion réelle avec la même URL que celle configurée.
+node -e "const u=new URL(process.env.DATABASE_URL); import('mysql2/promise').then(m=>m.createConnection({uri:process.env.DATABASE_URL}).then(c=>c.query('SELECT VERSION() v').then(r=>{console.log('MySQL',r[0].v);return c.end()})).catch(e=>{console.error('ECHEC',e.message);process.exit(1)}))"
+```
+
+### 8.4 Ordre de déploiement
+
+L'ordre est impératif, sinon l'application démarre sans base et le préflight
+échoue :
+
+1. Déployer la ressource **MySQL** et attendre qu'elle soit *Running*.
+2. Relever l'URL et la coller dans `DATABASE_URL`.
+3. Renseigner toutes les variables de 7.10.
+4. Déployer l'application (`Deploy`).
+5. Vérifier `/healthz`, puis le catalogue.
 
 ---
 
@@ -619,3 +786,87 @@ docker exec <conteneur-db> mysqldump -u root -p"$MYSQL_ROOT_PASSWORD" gunsmaster
 `scripts/production-preflight.mjs` refuse tout déploiement si : variable manquante/`CHANGE_ME`,
 `CANONICAL_ORIGIN` non-HTTPS, `JWT_SECRET` < 32 car., `DATABASE_URL` non-`mysql://`.
 C'est volontaire : mieux vaut un deploy bloqué qu'une prod cassée.
+
+---
+
+## Annexe C — État SEO vérifié et chantiers en attente
+### Ce qui est en place et vérifié
+
+- **Domaine** : `gunmaster-pro.com` partout (code, sitemap, robots, canoniques,
+  `.env.production.example`, `netlify.toml`, les deux guides).
+- **`sitemap.xml`** : 253 URL (14 pages + 239 fiches), jusqu'à 8 images par
+  produit, `lastmod` issu de `updatedAt` en base et non plus d'une date unique,
+  `changefreq`/`priority` différenciés.
+- **Résilience du sitemap** : il retombe sur le snapshot embarqué si MySQL est
+  injoignable. Un sitemap en 503 est traité comme une suppression par Google,
+  ce qui effacerait l'indexation au premier incident de base.
+- **`robots.txt`** : seul `/administration` est bloqué. Les pages privées
+  (`/panier`, `/favoris`, `/suivi`) ne sont plus `Disallow`, car une directive
+  `Disallow` empêche les robots de lire le `noindex` et empêche donc la
+  désindexation.
+- **Données structurées** (`client/src/ssr/prefetch.ts`) : `Organization`,
+  `WebSite` + `SearchAction`, `WebPage`, `Product` (offres, stock, galerie,
+  `additionalProperty` caliber/material/capacity/…), `BreadcrumbList`,
+  `ItemList`, `FAQPage` trilingue.
+
+### Sous-catégories : 14 catégories issues des données réelles
+
+Les 23 libellés par type d'action qui figuraient auparavant n'étaient adossés à
+**aucun produit** : `products.subCategory` contenait des valeurs sans lien
+(`original-imported`, `glock`, `beretta`, `223-bore`…), et aucune clé étrangère
+ne reliait les deux tables. Publier 23 pages dans cet état produisait 23 pages
+vides, donc du contenu mince — ce que les moteurs pénalisent.
+
+Mesures faites avant toute écriture (`tools/analyseSubcategories.mjs`,
+`tools/analyseFamilles.mjs`) :
+
+| Constat | Valeur |
+|---|---|
+| Catégories de l'export pakarms.co | **14** (basées marque/calibre) |
+| Données d'action (verrou, levier, pompe, superposé) | **absentes** : ni attribut, ni tag |
+| Sous-catégories par type d'action alimentées | **9 sur 23**, dont 4 avec 1–2 produits |
+| Revolver, mono-coup, levier, pompe, juxtaposé, superposé, modérateur, poudre noire, arme de collection | **0 produit** |
+
+La taxonomie publiée est donc celle des données : **14 catégories, toutes
+alimentées**, rattachées par la catégorie de source du produit (taxonomie
+pakarms.co), et non par déduction sur le nom. Les 15 produits sans catégorie de
+source sont affectés par des règles explicites et journalisées ; les 10 produits
+historiques hors export restent sans sous-catégorie et leurs anciennes valeurs
+libres ont été supprimées.
+
+| Catégorie | Famille | Produits |
+|---|---|---|
+| `original-imported` | Armes de poing | 38 |
+| `30-bore-7-shot-762mm` | Armes de poing | 29 |
+| `glock` | Armes de poing | 28 |
+| `beretta` | Armes de poing | 20 |
+| `assault-rifles` | Carabines | 23 |
+| `223-bore` | Carabines | 16 |
+| `heavy-machine-guns` | Carabines | 3 |
+| `12-bore` | Fusils | 8 |
+| `colt-1911` / `small-weapons` / `zigana` / `taurus` | Armes de poing | 11 / 11 / 10 / 3 |
+| `ammunition` | Accessoires | 9 |
+| `pistol-accessories` | Accessoires | 19 |
+
+Chaque catégorie a une page `/categorie/<slug>` : titre et description
+trilingues (FR/EN/DE), fil d'Ariane passant par la famille, `CollectionPage`
+avec `ItemList`, et un `og:image` pris parmi les visuels produits déjà
+téléversés. `tools/applySubcategories.mjs` **refuse d'écrire** une catégorie sans
+produit, et `server/subcategories.test.ts` fait échouer la suite si une
+catégorie vide ou un rattachement non déclaré réapparaît.
+
+> Les 23 visuels de `public/images categories` restent dans le bucket mais ne
+> correspondent plus à la taxonomie publiée (ils sont nommés par type d'action).
+> Ils ne sont plus référencés ; ils pourront servir si une taxonomie par type
+> d'action est alimentée un jour.
+
+### Chantier 1 — SEO international : URLs `/en/` et `/de/` (en attente)
+
+### Ce qui est volontairement absent
+
+Le `<meta name="keywords">` est conservé mais n'est plus utilisé comme levier :
+Google l'ignore depuis 2009. Les titres et descriptions sont produits **par page**
+à partir des données réelles (catégorie, marque, calibre, modèle) ; répéter un
+même lot de mots-clés sur toutes les pages est au contraire pénalisé.
+
+---

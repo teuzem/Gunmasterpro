@@ -1,0 +1,439 @@
+# GunsMasterPro — Déploiement rapide (commandes seules)
+
+Guide d'exécution. Aucun tableau, aucune explication : uniquement les étapes et
+les commandes, dans l'ordre. Pour le guide détaillé, voir `DEPLOIEMENT-COOLIFY.md`.
+
+---
+
+## 0. À avoir sous la main
+
+- IP du VPS Contabo, accès `root`
+- Domaine : `gunmaster-pro.com`
+- Dépôt GitHub, branche `main`
+- Terminal SSH (Termius)
+- Clés Manus : `BUILT_IN_FORGE_API_URL`, `BUILT_IN_FORGE_API_KEY`
+- Application déjà construite : identifiant, `OWNER_OPEN_ID`
+
+**Ordre obligatoire** : DNS → SSH → Coolify → MySQL → variables → application →
+seed. Sauter une étape casse le déploiement.
+
+---
+
+## 1. DNS (à faire en premier)
+
+Chez le registrar, sur `gunmaster-pro.com` :
+
+- enregistrement `A` nom `@` → IP du VPS
+- enregistrement `A` nom `www` → IP du VPS, ou `CNAME www` → `@`
+
+Vérifier :
+
+```bash
+nslookup gunmaster-pro.com
+nslookup www.gunmaster-pro.com
+```
+
+Les deux doivent renvoyer l'IP du VPS.
+
+---
+
+## 2. Connexion root et mise à jour
+
+```bash
+ssh root@<VPS_IP>
+```
+
+```bash
+apt update && apt upgrade -y
+apt install -y curl ca-certificates git ufw fail2ban
+```
+
+---
+
+## 3. Créer le groupe et l'utilisateur projet
+
+```bash
+groupadd --system gmp-deploy
+getent group gmp-deploy
+```
+
+```bash
+useradd --create-home --home-dir /home/gmp-deploy --shell /bin/bash --gid gmp-deploy gmp-deploy
+passwd gmp-deploy
+id gmp-deploy
+```
+
+Assigner le groupe sudo :
+
+```bash
+usermod -aG sudo gmp-deploy
+id -nG gmp-deploy
+```
+
+Attendu : `gmp-deploy sudo`.
+
+---
+
+## 4. Générer et installer la clé SSH
+
+```bash
+install -d -m 700 -o gmp-deploy -g gmp-deploy /home/gmp-deploy/.ssh
+```
+
+```bash
+install -d -m 700 /root/.ssh/gmp
+ssh-keygen -t ed25519 -a 100 -N "" -C "gmp-deploy@gunmaster-pro" -f /root/.ssh/gmp/id_ed25519
+cat /root/.ssh/gmp/id_ed25519.pub
+```
+
+Installer la clé publique :
+
+```bash
+cat /root/.ssh/gmp/id_ed25519.pub >> /home/gmp-deploy/.ssh/authorized_keys
+chown -R gmp-deploy:gmp-deploy /home/gmp-deploy/.ssh
+chmod 700 /home/gmp-deploy/.ssh
+chmod 600 /home/gmp-deploy/.ssh/authorized_keys
+ls -l /home/gmp-deploy/.ssh/
+```
+
+Transférer la clé privée `id_ed25519` dans Termius, puis l'effacer du serveur :
+
+```bash
+rm -f /root/.ssh/gmp/id_ed25519
+rm -rf /root/.ssh/gmp
+```
+
+---
+
+## 5. Vérifier la connexion par clé
+
+Dans Termius, nouvel hôte :
+
+- username `gmp-deploy`
+- authentification par clé
+- pas de mot de passe
+
+Contrôler, dans l'ordre :
+
+```bash
+whoami
+id -nG
+sudo -v
+sudo whoami
+```
+
+Si les quatre répondent, continuer. **Ne pas durcir SSH avant ce test.**
+
+---
+
+## 6. Pare-feu
+
+Revenir en `root`, puis :
+
+```bash
+ufw allow 22/tcp comment 'SSH'
+ufw allow 80/tcp comment 'HTTP'
+ufw allow 443/tcp comment 'HTTPS'
+ufw --force enable
+ufw status verbose
+```
+
+---
+
+## 7. Durcir SSH
+
+```bash
+cp /etc/ssh/sshd_config /etc/ssh/sshd_config.bak
+sed -i 's/^#\?PermitRootLogin.*/PermitRootLogin prohibit-password/' /etc/ssh/sshd_config
+sed -i 's/^#\?PasswordAuthentication.*/PasswordAuthentication no/' /etc/ssh/sshd_config
+grep -E '^(PermitRootLogin|PasswordAuthentication)' /etc/ssh/sshd_config
+sshd -t && echo "configuration valide"
+systemctl reload ssh
+```
+
+Reconnecter en `gmp-deploy` pour confirmer. Garder la console Web Contabo ouverte.
+
+---
+
+## 8. Installer Coolify
+
+```bash
+curl -fsSL https://cdn.coolify.io/install.sh | sudo bash
+```
+
+Contrôler :
+
+```bash
+sudo systemctl is-active docker
+docker --version
+sudo ss -tlnp | grep 8000
+```
+
+Ouvrir `http://<VPS_IP>:8000`, créer le compte administrateur.
+
+Assigner le groupe docker à l'utilisateur :
+
+```bash
+getent group docker >/dev/null && sudo usermod -aG docker gmp-deploy
+id -nG gmp-deploy
+```
+
+Se reconnecter ensuite pour que le groupe soit pris en compte.
+
+---
+
+## 9. Pousser le code sur GitHub
+
+Sur le PC, depuis le dépôt :
+
+```bash
+cd C:\Users\Mr Tegou\Downloads\gunsmasterpro-manus
+git add -A
+git commit -m "Configuration Coolify : taxonomie, SEO, media"
+git push -u origin main
+```
+
+Vérifier qu'aucun secret n'est versionné :
+
+```bash
+git ls-files | findstr .env
+```
+
+Seul `.env.production.example` doit apparaître.
+
+---
+
+## 10. Créer la ressource MySQL
+
+Dans Coolify : projet `production` → New Resource → Database → MySQL.
+
+- Name : `gunsmasterpro-db`
+- Image : `mysql:8.4`
+- Normal user : `gunsmasterpro`
+- Normal user password : 24 caractères minimum
+- Initial database : `gunsmasterpro`
+- Port mappings : **laisser vide** (usage interne uniquement)
+- Charset : `utf8mb4`
+- Collation : `utf8mb4_unicode_ci`
+
+Activer les sauvegardes planifiées. Déployer, attendre l'état *Running*.
+
+### 10.1 Récupérer les identifiants
+
+Tout est dans la ressource MySQL → onglet **General** :
+
+- *Root password* : bouton œil pour l'afficher, ou champ Environment Variables
+- *Normal user* : `gunsmasterpro`
+- *Normal user password* : bouton œil pour l'afficher
+- *MySQL URL (internal)* : **bouton copier** à droite du champ — c'est cette
+  chaîne qu'il faut mettre dans `DATABASE_URL`
+
+Emplacement dans l'interface :
+
+```text
+MySQL resource mysql-database-…  →  General  →  Credentials
+MySQL resource mysql-database-…  →  General  →  Runtime and network  →  MySQL URL (internal)
+MySQL resource mysql-database-…  →  Environment Variables  →  URL interne de la base
+```
+
+Si l'onglet Environment Variables de la ressource MySQL expose déjà une variable
+`DATABASE_URL`, la copier de là : elle est déjà au bon format.
+
+### 10.2 Si « Initial database » vaut `default`
+
+Coolify ne crée la base **qu'au tout premier démarrage**, quand le volume est
+vide. Changer ce champ plus tard ne crée rien. Si la base `gunsmasterpro`
+n'existe pas, la créer dans le **Terminal** de la ressource MySQL :
+
+```bash
+mysql -u root -p -e "CREATE DATABASE IF NOT EXISTS gunsmasterpro CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+```
+
+```bash
+mysql -u root -p -e "GRANT ALL PRIVILEGES ON gunsmasterpro.* TO 'gunsmasterpro'@'%'; FLUSH PRIVILEGES;"
+```
+
+Vérifier ensuite version et base :
+
+```bash
+mysql -u root -p -e "SELECT VERSION(); SHOW DATABASES;"
+```
+
+Si le mot de passe contient `@`, `#`, `/` ou `:`, l'encoder dans `DATABASE_URL`
+(`%40`, `%23`, `%2F`, `%3A`), sinon la connexion échoue sans message clair.
+
+---
+
+## 11. Créer la ressource application
+
+Dans Coolify : projet `production` → New Resource → Docker Compose.
+
+- Source : dépôt GitHub
+- Branch : `main`
+- Docker Compose location : `/docker-compose.coolify.yml`
+- Build pack : Dockerfile
+
+Le compose ne déclare **que** le service `app` : MySQL est une ressource séparée.
+
+---
+
+## 12. Variables d'environnement de l'application
+
+Les valeurs sont préparées dans `.env.production.local`, à la racine du dépôt.
+Ce fichier est ignoré par Git et par Docker : il n'est ni commité, ni copié dans
+l'image.
+
+Ouvrir ce fichier, remplacer `<HOTE_INTERNE_COOLIFY>` par l'hôte copié à
+l'étape 10.1, compléter les trois `CHANGE_ME`, puis copier chaque ligne `NOM=VALEUR`
+dans l'onglet **Environment Variables** de la ressource app.
+
+```text
+DATABASE_URL=<recopier depuis MySQL URL (internal), base gunsmasterpro>
+JWT_SECRET=<valeur présente dans .env.production.local>
+VITE_APP_ID=<identifiant applicatif Manus>
+OAUTH_SERVER_URL=https://api.manus.im
+OWNER_OPEN_ID=<openId du compte propriétaire, voir tools/showOwnerOpenId.mjs>
+OWNER_NAME=GunsMasterPro
+SITE_NAME=GunsMasterPro
+CANONICAL_ORIGIN=https://gunmaster-pro.com
+BUILT_IN_FORGE_API_URL=https://forge.manus.ai
+BUILT_IN_FORGE_API_KEY=<clé Manus Storage>
+```
+
+Générer un `JWT_SECRET` si celui du fichier local est compromis :
+
+```bash
+openssl rand -hex 32
+```
+
+Récupérer le vrai `OWNER_OPEN_ID` — cette valeur **n'est pas générable**, elle
+doit correspondre à un compte Manus réel, sinon l'administration reste
+verrouillée :
+
+```bash
+# 1. Se connecter une fois au site avec le compte Manus du propriétaire
+# 2. Puis, dans le conteneur :
+node tools/showOwnerOpenId.mjs
+```
+
+Ne pas créer `MYSQL_PASSWORD` ni `MYSQL_ROOT_PASSWORD` : inutiles avec une
+ressource MySQL gérée.
+
+Contrôler que la base répond, depuis le conteneur `app` :
+
+```bash
+node -e "import('mysql2/promise').then(m=>m.createConnection({uri:process.env.DATABASE_URL}).then(c=>c.query('SELECT VERSION() v').then(r=>{console.log('MySQL',r[0].v);return c.end()})).catch(e=>{console.error('ECHEC',e.message);process.exit(1)}))"
+```
+
+Attendu : `MySQL 8.4.x`. Un `ECHEC` ici signifie que l'hôte, le mot de passe ou
+le nom de base est incorrect — ne pas déployer avant que cette commande passe.
+
+---
+
+## 13. Domaines
+
+Onglet Domains :
+
+- supprimer l'URL `sslip.io` générée automatiquement
+- ajouter `gunmaster-pro.com`
+- ajouter `www.gunmaster-pro.com`
+- port `3000`
+- HTTPS activé (Let's Encrypt)
+
+---
+
+## 14. Réseau, stockage et cycle de vie
+
+Onglet Networking :
+
+- port interne `3000`
+- aucun port publié
+
+Onglet Persistent Storage : le volume `gmp_media` monté sur `/app/data/media`
+est créé par le compose. Ne pas le supprimer.
+
+Onglet Deployment lifecycle :
+
+- auto deploy ON
+- health check `/healthz`
+- start period `45s`
+- wait for health check ON
+
+---
+
+## 15. Déployer
+
+Bouton **Deploy**. Puis vérifier les logs : le build exécute
+`pnpm check && pnpm test && pnpm build`, et un test en échec bloque tout.
+
+---
+
+## 16. Appliquer migrations et seed
+
+Terminal du conteneur `app` (Coolify → Terminal) :
+
+```bash
+pnpm db:migrate
+node tools/seedCatalogueMedia.mjs
+pnpm exec tsx scripts/seed-hero-slides.ts
+node tools/verifyMediaUrls.mjs
+```
+
+`verifyMediaUrls.mjs` sort en code 3 si un visuel est injoignable.
+
+Contrôle SQL :
+
+```sql
+SELECT COUNT(*) FROM products;
+SELECT COUNT(*) FROM catalogueCategories;
+SELECT COUNT(*) FROM homeHeroSlides WHERE isActive = 1;
+SELECT COUNT(*) FROM mediaAssets WHERE transferStatus = 'transferred';
+SELECT mediaTransferState, COUNT(*) FROM products GROUP BY 1;
+```
+
+Attendu : 239 produits, 14 catégories, 20 slides, tous les produits `complete`.
+
+---
+
+## 17. Vérifications finales
+
+```bash
+curl -fsS https://gunmaster-pro.com/healthz
+curl -I https://gunmaster-pro.com/
+curl -s https://gunmaster-pro.com/robots.txt
+curl -s https://gunmaster-pro.com/sitemap.xml | grep -c "<url>"
+```
+
+Puis, dans le navigateur :
+
+- catalogue affiché avec les visuels, sans image cassée
+- une page `/categorie/glock` et `/categorie/ammunition` qui répondent
+- création d'une demande de test
+
+---
+
+## 18. Diagnostic
+
+Ressource en **Exited** :
+
+- lire les logs du build ; un test en échec arrête tout
+- vérifier que les 5 variables bloquantes sont présentes
+- vérifier que `git push` a bien remonté la version du compose
+
+`/healthz` répond mais le catalogue est vide :
+
+- vérifier `mediaTransferState = 'complete'` sur les produits
+- vérifier que `BUILT_IN_FORGE_API_URL` et `BUILT_IN_FORGE_API_KEY` sont defined
+
+Images repli SVG au lieu des visuels :
+
+- `/manus-storage/*` ne sert rien sans les clés Forge
+
+TLS en erreur :
+
+- le DNS ne répond pas encore, ou le domaine contient un caractère interdit :
+  uniquement lettres, chiffres, tirets et points
+
+Perte d'accès SSH :
+
+- utiliser la console Web Contabo, puis vérifier `/home/gmp-deploy/.ssh/authorized_keys`

@@ -107,7 +107,11 @@ temp/
 *.sqlite3
 
 # Self-hosted media uploads (volumes Coolify / local)
-data/
+# Ancrage à la racine : sans « / », cette règle exclut TOUT dossier nommé data,
+# y compris server/data/ qui contient le snapshot catalogue et la taxonomie
+# importés par server/catalog.ts au build. Leur absence fait échouer
+# « pnpm build » sur Coolify.
+/data/
 
 # Webdev artifacts (checkpoint zips, migrations, etc.)
 .webdev/

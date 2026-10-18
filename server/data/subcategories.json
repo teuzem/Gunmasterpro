@@ -1,0 +1,296 @@
+[
+  {
+    "slug": "original-imported",
+    "parentCategory": "handguns",
+    "label": "Importations originales",
+    "labelI18n": {
+      "fr": "Importations originales",
+      "en": "Original imports",
+      "de": "Originalimporte"
+    },
+    "description": "Importations originales : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+    "descriptionI18n": {
+      "fr": "Importations originales : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+      "en": "Original imports: verified GunsMasterPro references, documented media and a guided enquiry process.",
+      "de": "Originalimporte: geprüfte GunsMasterPro-Referenzen, dokumentierte Medien und begleitete Anfrage."
+    },
+    "imageUrl": "/manus-storage/catalogue/pakarms/4572/1_e7e5c05f.jpeg",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
+    "mediaRightsStatus": "verified",
+    "position": 1,
+    "productCount": 38
+  },
+  {
+    "slug": "30-bore-7-shot-762mm",
+    "parentCategory": "handguns",
+    "label": "Pistolets 30 Bore 7 coups",
+    "labelI18n": {
+      "fr": "Pistolets 30 Bore 7 coups",
+      "en": "30 Bore 7-shot pistols",
+      "de": "30-Bore-7-Schuss-Pistolen"
+    },
+    "description": "Pistolets 30 Bore 7 coups : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+    "descriptionI18n": {
+      "fr": "Pistolets 30 Bore 7 coups : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+      "en": "30 Bore 7-shot pistols: verified GunsMasterPro references, documented media and a guided enquiry process.",
+      "de": "30-Bore-7-Schuss-Pistolen: geprüfte GunsMasterPro-Referenzen, dokumentierte Medien und begleitete Anfrage."
+    },
+    "imageUrl": "/manus-storage/catalogue/pakarms/3488/1_0927bcf6.jpg",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
+    "mediaRightsStatus": "verified",
+    "position": 2,
+    "productCount": 29
+  },
+  {
+    "slug": "glock",
+    "parentCategory": "handguns",
+    "label": "Glock",
+    "labelI18n": {
+      "fr": "Glock",
+      "en": "Glock",
+      "de": "Glock"
+    },
+    "description": "Glock : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+    "descriptionI18n": {
+      "fr": "Glock : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+      "en": "Glock: verified GunsMasterPro references, documented media and a guided enquiry process.",
+      "de": "Glock: geprüfte GunsMasterPro-Referenzen, dokumentierte Medien und begleitete Anfrage."
+    },
+    "imageUrl": "/manus-storage/catalogue/pakarms/3209/1_2a89bb1e.jpg",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
+    "mediaRightsStatus": "verified",
+    "position": 3,
+    "productCount": 28
+  },
+  {
+    "slug": "beretta",
+    "parentCategory": "handguns",
+    "label": "Beretta",
+    "labelI18n": {
+      "fr": "Beretta",
+      "en": "Beretta",
+      "de": "Beretta"
+    },
+    "description": "Beretta : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+    "descriptionI18n": {
+      "fr": "Beretta : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+      "en": "Beretta: verified GunsMasterPro references, documented media and a guided enquiry process.",
+      "de": "Beretta: geprüfte GunsMasterPro-Referenzen, dokumentierte Medien und begleitete Anfrage."
+    },
+    "imageUrl": "/manus-storage/catalogue/pakarms/3603/1_5ff31af8.jpeg",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
+    "mediaRightsStatus": "verified",
+    "position": 4,
+    "productCount": 20
+  },
+  {
+    "slug": "colt-1911",
+    "parentCategory": "handguns",
+    "label": "Colt 1911",
+    "labelI18n": {
+      "fr": "Colt 1911",
+      "en": "Colt 1911",
+      "de": "Colt 1911"
+    },
+    "description": "Colt 1911 : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+    "descriptionI18n": {
+      "fr": "Colt 1911 : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+      "en": "Colt 1911: verified GunsMasterPro references, documented media and a guided enquiry process.",
+      "de": "Colt 1911: geprüfte GunsMasterPro-Referenzen, dokumentierte Medien und begleitete Anfrage."
+    },
+    "imageUrl": "/manus-storage/catalogue/pakarms/3588/1_d48eb3cc.jpeg",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
+    "mediaRightsStatus": "verified",
+    "position": 5,
+    "productCount": 11
+  },
+  {
+    "slug": "zigana",
+    "parentCategory": "handguns",
+    "label": "Zigana",
+    "labelI18n": {
+      "fr": "Zigana",
+      "en": "Zigana",
+      "de": "Zigana"
+    },
+    "description": "Zigana : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+    "descriptionI18n": {
+      "fr": "Zigana : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+      "en": "Zigana: verified GunsMasterPro references, documented media and a guided enquiry process.",
+      "de": "Zigana: geprüfte GunsMasterPro-Referenzen, dokumentierte Medien und begleitete Anfrage."
+    },
+    "imageUrl": "/manus-storage/catalogue/pakarms/3548/1_b751b639.jpeg",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
+    "mediaRightsStatus": "verified",
+    "position": 6,
+    "productCount": 10
+  },
+  {
+    "slug": "taurus",
+    "parentCategory": "handguns",
+    "label": "Taurus",
+    "labelI18n": {
+      "fr": "Taurus",
+      "en": "Taurus",
+      "de": "Taurus"
+    },
+    "description": "Taurus : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+    "descriptionI18n": {
+      "fr": "Taurus : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+      "en": "Taurus: verified GunsMasterPro references, documented media and a guided enquiry process.",
+      "de": "Taurus: geprüfte GunsMasterPro-Referenzen, dokumentierte Medien und begleitete Anfrage."
+    },
+    "imageUrl": "/manus-storage/catalogue/pakarms/3597/1_f5e9a1a2.jpeg",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
+    "mediaRightsStatus": "verified",
+    "position": 7,
+    "productCount": 3
+  },
+  {
+    "slug": "small-weapons",
+    "parentCategory": "handguns",
+    "label": "Autres armes de poing",
+    "labelI18n": {
+      "fr": "Autres armes de poing",
+      "en": "Other handguns",
+      "de": "Weitere Kurzwaffen"
+    },
+    "description": "Autres armes de poing : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+    "descriptionI18n": {
+      "fr": "Autres armes de poing : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+      "en": "Other handguns: verified GunsMasterPro references, documented media and a guided enquiry process.",
+      "de": "Weitere Kurzwaffen: geprüfte GunsMasterPro-Referenzen, dokumentierte Medien und begleitete Anfrage."
+    },
+    "imageUrl": "/manus-storage/catalogue/pakarms/3375/1_e02238bf.jpg",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
+    "mediaRightsStatus": "verified",
+    "position": 8,
+    "productCount": 11
+  },
+  {
+    "slug": "assault-rifles",
+    "parentCategory": "rifles",
+    "label": "Fusils d'assaut",
+    "labelI18n": {
+      "fr": "Fusils d'assaut",
+      "en": "Assault rifles",
+      "de": "Sturmgewehre"
+    },
+    "description": "Fusils d'assaut : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+    "descriptionI18n": {
+      "fr": "Fusils d'assaut : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+      "en": "Assault rifles: verified GunsMasterPro references, documented media and a guided enquiry process.",
+      "de": "Sturmgewehre: geprüfte GunsMasterPro-Referenzen, dokumentierte Medien und begleitete Anfrage."
+    },
+    "imageUrl": "/manus-storage/catalogue/pakarms/3250/1_65f76da4.jpg",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
+    "mediaRightsStatus": "verified",
+    "position": 9,
+    "productCount": 24
+  },
+  {
+    "slug": "223-bore",
+    "parentCategory": "rifles",
+    "label": "Carabines 223 Bore",
+    "labelI18n": {
+      "fr": "Carabines 223 Bore",
+      "en": "223 Bore rifles",
+      "de": "223-Bore-Büchsen"
+    },
+    "description": "Carabines 223 Bore : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+    "descriptionI18n": {
+      "fr": "Carabines 223 Bore : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+      "en": "223 Bore rifles: verified GunsMasterPro references, documented media and a guided enquiry process.",
+      "de": "223-Bore-Büchsen: geprüfte GunsMasterPro-Referenzen, dokumentierte Medien und begleitete Anfrage."
+    },
+    "imageUrl": "/manus-storage/catalogue/pakarms/3300/1_a4867e18.jpeg",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
+    "mediaRightsStatus": "verified",
+    "position": 10,
+    "productCount": 16
+  },
+  {
+    "slug": "heavy-machine-guns",
+    "parentCategory": "rifles",
+    "label": "Mitrailleuses",
+    "labelI18n": {
+      "fr": "Mitrailleuses",
+      "en": "Heavy machine guns",
+      "de": "Schwere Maschinengewehre"
+    },
+    "description": "Mitrailleuses : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+    "descriptionI18n": {
+      "fr": "Mitrailleuses : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+      "en": "Heavy machine guns: verified GunsMasterPro references, documented media and a guided enquiry process.",
+      "de": "Schwere Maschinengewehre: geprüfte GunsMasterPro-Referenzen, dokumentierte Medien und begleitete Anfrage."
+    },
+    "imageUrl": "/manus-storage/catalogue/pakarms/3274/1_c1270c97.jpg",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
+    "mediaRightsStatus": "verified",
+    "position": 11,
+    "productCount": 3
+  },
+  {
+    "slug": "12-bore",
+    "parentCategory": "shotguns",
+    "label": "Fusils 12 Bore",
+    "labelI18n": {
+      "fr": "Fusils 12 Bore",
+      "en": "12 Bore shotguns",
+      "de": "12-Bore-Flinten"
+    },
+    "description": "Fusils 12 Bore : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+    "descriptionI18n": {
+      "fr": "Fusils 12 Bore : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+      "en": "12 Bore shotguns: verified GunsMasterPro references, documented media and a guided enquiry process.",
+      "de": "12-Bore-Flinten: geprüfte GunsMasterPro-Referenzen, dokumentierte Medien und begleitete Anfrage."
+    },
+    "imageUrl": "/manus-storage/catalogue/pakarms/3753/1_62449921.jpg",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
+    "mediaRightsStatus": "verified",
+    "position": 12,
+    "productCount": 8
+  },
+  {
+    "slug": "ammunition",
+    "parentCategory": "accessories",
+    "label": "Munitions",
+    "labelI18n": {
+      "fr": "Munitions",
+      "en": "Ammunition",
+      "de": "Munition"
+    },
+    "description": "Munitions : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+    "descriptionI18n": {
+      "fr": "Munitions : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+      "en": "Ammunition: verified GunsMasterPro references, documented media and a guided enquiry process.",
+      "de": "Munition: geprüfte GunsMasterPro-Referenzen, dokumentierte Medien und begleitete Anfrage."
+    },
+    "imageUrl": "/manus-storage/catalogue/pakarms/3361/1_d2a77dd3.jpg",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
+    "mediaRightsStatus": "verified",
+    "position": 13,
+    "productCount": 9
+  },
+  {
+    "slug": "pistol-accessories",
+    "parentCategory": "accessories",
+    "label": "Accessoires pour pistolet",
+    "labelI18n": {
+      "fr": "Accessoires pour pistolet",
+      "en": "Pistol accessories",
+      "de": "Pistolenzubehör"
+    },
+    "description": "Accessoires pour pistolet : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+    "descriptionI18n": {
+      "fr": "Accessoires pour pistolet : références vérifiées du catalogue GunsMasterPro, médias documentés et demande encadrée.",
+      "en": "Pistol accessories: verified GunsMasterPro references, documented media and a guided enquiry process.",
+      "de": "Pistolenzubehör: geprüfte GunsMasterPro-Referenzen, dokumentierte Medien und begleitete Anfrage."
+    },
+    "imageUrl": "/manus-storage/catalogue/pakarms/3203/1_1469081f.jpg",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
+    "mediaRightsStatus": "verified",
+    "position": 14,
+    "productCount": 19
+  }
+]

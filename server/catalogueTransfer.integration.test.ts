@@ -2,7 +2,15 @@ import ExcelJS from "exceljs";
 import { describe, expect, it } from "vitest";
 import { createCatalogueExport, validateCatalogueImportRows } from "./catalogueTransfer";
 
-describe("centre de transfert catalogue", () => {
+// Ces deux cas lisent des produits **persistés** : ils exigent une base
+// MySQL réelle. Sans DATABASE_URL, ils étaient en échec et faisaient échouer
+// `pnpm test`, donc `RUN pnpm check && pnpm test && pnpm build` dans le
+// Dockerfile — donc le build Docker lui-même, donc la ressource Coolify reste
+// « Exited » avant même de démarrer le conteneur. Ils sont donc ignorés quand
+// aucune base n'est configurée, et exécutés dès qu'elle l'est.
+const withDatabase = process.env.DATABASE_URL ? describe : describe.skip;
+
+withDatabase("centre de transfert catalogue", () => {
   it("génère un modèle Excel réel, filtrable et prérempli à partir de deux produits persistants", async () => {
     const payload = await createCatalogueExport("xlsx", true);
     const workbook = new ExcelJS.Workbook();

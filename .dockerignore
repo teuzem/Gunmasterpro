@@ -1,7 +1,10 @@
 node_modules
 .pnpm-store
 dist
-data/
+# Ancrage à la racine : « data/ » sans « / » retirait aussi server/data/, dont
+# le snapshot catalogue et la taxonomie sont importés au build par
+# server/catalog.ts. Leur absence fait échouer « pnpm build ».
+/data/
 .git
 .github
 .env
@@ -13,3 +16,10 @@ coverage
 *.log
 screenshots
 terminal_full_output
+
+# 992 Mo d'originaux déjà téléversés dans le bucket de stockage. Le build ne
+# les utilise pas : Vite sert les publics depuis client/public (voir
+# publicDir dans vite.config.ts). Sans cette exclusion, `COPY . .` envoie tout
+# le contexte au démon Docker, ce qui ralentit fortement le build et peut le
+# faire échouer sur un petit VPS.
+public/
