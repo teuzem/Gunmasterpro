@@ -420,6 +420,25 @@ Ressource en **Exited** :
 - vérifier que les 5 variables bloquantes sont présentes
 - vérifier que `git push` a bien remonté la version du compose
 
+**Le build Docker échoue sur les tests d'intégration** :
+
+```text
+Caused by: Error: Table 'default.products' doesn't exist
+```
+
+Coolify injecte les variables de la ressource dans l'étape de build. Les tests
+d'intégration ne s'exécutent que si `RUN_DB_TESTS=true` est défini, ce qui n'est
+pas le cas d'un build : ils sont donc ignorés et le build passe. Pour les exécuter
+volontairement, sur une base locale migrée :
+
+```bash
+pnpm db:migrate
+RUN_DB_TESTS=true pnpm test
+```
+
+Si `DATABASE_URL` pointe vers `default` au lieu de `gunsmasterpro`, corriger
+d'abord la base (étape 10.2) puis l'URL interne recopiée à l'étape 10.1.
+
 `/healthz` répond mais le catalogue est vide :
 
 - vérifier `mediaTransferState = 'complete'` sur les produits
