@@ -28,6 +28,11 @@ COPY --from=build /app/drizzle.config.ts ./drizzle.config.ts
 COPY --from=build /app/server ./server
 COPY --from=build /app/shared ./shared
 COPY --from=build /app/scripts ./scripts
+# Outils d'exploitation : seed catalogue, vérification des visuels, relevé de
+# l'openId propriétaire. Ils sont exécutés depuis le conteneur en production
+# (Coolify > Terminal), donc doivent exister dans l'image. Les manifestes
+# tools/*.json qu'ils lisent sont versionnés avec le code.
+COPY --from=build /app/tools ./tools
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 CMD node -e "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/healthz').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"

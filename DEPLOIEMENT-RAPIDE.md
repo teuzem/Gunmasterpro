@@ -379,6 +379,20 @@ pnpm exec tsx scripts/seed-hero-slides.ts
 node tools/verifyMediaUrls.mjs
 ```
 
+Ces quatre commandes sont exécutables **dans le conteneur** : le `Dockerfile`
+copie `scripts/`, `tools/`, `server/` et `drizzle/` dans l'image.
+
+En revanche, les outils qui lisent les originaux dans `public/` ne sont
+exécutables que depuis le poste de travail, jamais dans le conteneur (le dossier
+`public/` est volontairement exclu de l'image) :
+
+```text
+tools/uploadCategoryImages.mjs    téléversement des visuels de catégories
+tools/uploadProductMedia.mjs      téléversement hero + produits
+tools/applySubcategories.mjs      rattachement des produits aux catégories
+tools/applyManifestToSnapshot.mjs projection du manifeste sur le snapshot
+```
+
 `verifyMediaUrls.mjs` sort en code 3 si un visuel est injoignable.
 
 ### 16.1 Si la migration échoue avec « Table … already exists »
