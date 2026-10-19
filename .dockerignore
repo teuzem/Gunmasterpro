@@ -23,8 +23,3 @@ terminal_full_output
 # le contexte au démon Docker, ce qui ralentit fortement le build et peut le
 # faire échouer sur un petit VPS.
 public/
-# Les images de catalogue DOIVENT être dans l'image pour être servies depuis
-# /app/data/media/ par le serveur Node.
-!public/images categories
-!public/images hero section
-!public/pakarms_catalog_export/images
