@@ -142,7 +142,7 @@ pnpm db:deploy
 node tools/seedCatalogueMedia.mjs
 
 # 20 slides hero FR/EN/DE (upsert sur position)
-pnpm exec tsx scripts/seed-hero-slides.ts
+node --import tsx scripts/seed-hero-slides.ts
 
 # Contrôle final : chaque URL doit répondre 200/206 (sort en code 3 sinon)
 node tools/verifyMediaUrls.mjs

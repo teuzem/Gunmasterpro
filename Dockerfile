@@ -17,6 +17,9 @@ ENV PORT=3000
 ENV HOST=0.0.0.0
 ENV PNPM_HOME=/pnpm
 ENV PATH=$PNPM_HOME:$PATH
+# Corepack ne doit jamais bloquer sur une invite interactive dans le conteneur :
+# au runtime il n'a plus le cache du build et proposerait de télécharger pnpm.
+ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
 RUN corepack enable && corepack prepare pnpm@10.4.1 --activate
 COPY package.json pnpm-lock.yaml ./
 COPY patches ./patches
@@ -33,6 +36,10 @@ COPY --from=build /app/scripts ./scripts
 # (Coolify > Terminal), donc doivent exister dans l'image. Les manifestes
 # tools/*.json qu'ils lisent sont versionnés avec le code.
 COPY --from=build /app/tools ./tools
+# scripts/seed-hero-slides.ts lit les textes trilingues des diapositives dans
+# client/src/lib/homeHeroContent.ts. Sans ce fichier, le seed hero échoue en
+# ERR_MODULE_NOT_FOUND. Seul le dossier lib est repris, pas tout le client.
+COPY --from=build /app/client/src/lib ./client/src/lib
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 CMD node -e "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/healthz').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"

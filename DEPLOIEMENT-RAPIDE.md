@@ -375,7 +375,7 @@ Terminal du conteneur `app` (Coolify → Terminal) :
 ```bash
 pnpm db:migrate
 node tools/seedCatalogueMedia.mjs
-pnpm exec tsx scripts/seed-hero-slides.ts
+node --import tsx scripts/seed-hero-slides.ts
 node tools/verifyMediaUrls.mjs
 ```
 

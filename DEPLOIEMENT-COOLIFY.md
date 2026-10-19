@@ -702,7 +702,7 @@ pnpm db:deploy
 node tools/seedCatalogueMedia.mjs
 
 # 3. 20 slides hero FR/EN/DE (idempotent, upsert sur position)
-pnpm exec tsx scripts/seed-hero-slides.ts
+node --import tsx scripts/seed-hero-slides.ts
 
 # 4. Contrôle final : chaque URL du catalogue doit répondre 200/206 via le
 #    pré-signage du bucket. Sort en code 3 si un visuel est injoignable.
