@@ -14,6 +14,10 @@ export default defineConfig({
   },
   test: {
     environment: "node",
-    include: ["server/**/*.test.ts", "server/**/*.spec.ts"],
+    // drizzle/** est inclus pour que les contrôles de schéma (limites de clé
+    // d'index MySQL) s'exécutent dans `pnpm test`, donc dans le build Docker :
+    // une dérive de schéma doit bloquer le déploiement, pas être découverte en
+    // production.
+    include: ["server/**/*.test.ts", "server/**/*.spec.ts", "drizzle/**/*.test.ts"],
   },
 });

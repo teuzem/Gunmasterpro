@@ -73,7 +73,16 @@ export const mediaAssets = mysqlTable("mediaAssets", {
   categorySlug: varchar("categorySlug", { length: 120 }),
   kind: mysqlEnum("kind", ["primary", "gallery", "category"]).notNull(),
   position: int("position").notNull().default(0),
-  sourceUrl: varchar("sourceUrl", { length: 2048 }).notNull(),
+  // 700 caractères maximum : la colonne porte un index UNIQUE et InnoDB limite
+  // une clé d'index à 3072 octets. En utf8mb4 (4 octets par caractère), 700
+  // caractères représentent 2800 octets, soit 272 octets de marge — InnoDB
+  // ajoutant encore quelques octets à l'enregistrement d'index, la limite
+  // utile est inférieure aux 768 caractères purement théoriques.
+  // Un varchar(2048) indexé renvoyait ER_TOO_LONG_KEY (1071) à la création de
+  // la table : aucune migration ne pouvait aboutir sur une base neuve.
+  // Les URL du catalogue sont des chemins /manus-storage/… de quelques dizaines
+  // de caractères, largement en dessous.
+  sourceUrl: varchar("sourceUrl", { length: 700 }).notNull(),
   storageKey: varchar("storageKey", { length: 2048 }),
   storageUrl: varchar("storageUrl", { length: 2048 }),
   contentType: varchar("contentType", { length: 120 }),
