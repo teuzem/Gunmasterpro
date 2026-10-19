@@ -40,6 +40,11 @@ COPY --from=build /app/tools ./tools
 # client/src/lib/homeHeroContent.ts. Sans ce fichier, le seed hero échoue en
 # ERR_MODULE_NOT_FOUND. Seul le dossier lib est repris, pas tout le client.
 COPY --from=build /app/client/src/lib ./client/src/lib
+# Copie des images de catégorie depuis le build context dans le stockage local
+# servi par /manus-storage/* au runtime.
+COPY --from=build /app/public/images categories ./data/media/images categories
+COPY --from=build /app/public/images hero section ./data/media/images hero section
+COPY --from=build /app/public/pakarms_catalog_export/images ./data/media/pakarms_catalog_export/images
 USER node
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 CMD node -e "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/healthz').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
