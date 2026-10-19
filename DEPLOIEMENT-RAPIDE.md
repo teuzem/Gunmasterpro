@@ -381,6 +381,36 @@ node tools/verifyMediaUrls.mjs
 
 `verifyMediaUrls.mjs` sort en code 3 si un visuel est injoignable.
 
+### 16.1 Si la migration échoue avec « Table … already exists »
+
+```text
+DrizzleQueryError: Failed query: CREATE TABLE `catalogueCategories` …
+cause: Error: Table 'catalogueCategories' already exists
+```
+
+En MySQL, chaque `CREATE TABLE` est validé immédiatement. Si une migration échoue
+en cours d'exécution, les tables déjà créées restent en base, alors que la table
+de suivi de Drizzle (`__drizzle_migrations`) est annulée. La migration suivante
+réessaie alors les mêmes `CREATE TABLE` et bute sur l'existant.
+
+Sur une base **neuve et sans donnée**, la correction est de repartir de zéro. Dans
+le Terminal de la ressource MySQL :
+
+```bash
+mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "DROP DATABASE IF EXISTS gunsmasterpro;"
+mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "CREATE DATABASE gunsmasterpro CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
+mysql -u root -p"$MYSQL_ROOT_PASSWORD" -e "GRANT ALL PRIVILEGES ON gunsmasterpro.* TO 'gunsmasterpro'@'%'; FLUSH PRIVILEGES;"
+```
+
+Puis, dans le conteneur `app` :
+
+```bash
+pnpm db:migrate
+```
+
+**Ne jamais faire ce `DROP` sur une base contenant des données.** Sauvegarder
+avant toute opération de ce type.
+
 Contrôle SQL :
 
 ```sql
