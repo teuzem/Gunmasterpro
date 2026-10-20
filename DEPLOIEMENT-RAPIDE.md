@@ -404,6 +404,19 @@ qui fait autorité pour le seed. Vérification préalable sans rien envoyer :
 node tools/pushMediaToServer.mjs --base https://gunmaster-pro.com --dry-run
 ```
 
+Les fichiers de plus de 512 Ko sont envoyés par fragments : le reverse proxy
+coupe une requête au bout de 60 s, ce qui suffit à faire échouer un visuel hero
+de 7 Mo en un seul envoi. Le réassemblage est fait par le serveur.
+
+**Point de vigilance : le volume doit être inscriptible**
+
+Le volume `gmp_media` est créé par Docker, donc propriétaire `root` et
+permissions `0755`. Le conteneur tournant en `USER node`, l'écriture y échouait
+(EACCES) et l'import renvoyait 500. Un point d'entrée (`docker/entrypoint.sh`)
+corrige les droits au démarrage puis lâche root. **Si l'import renvoie 500**,
+vérifiez que l'image a bien été reconstruite : le correctif est dans le
+`Dockerfile`, pas dans un paramètre.
+
 **3. Basculer les URL du catalogue**
 
 ```bash

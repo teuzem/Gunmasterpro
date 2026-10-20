@@ -155,25 +155,66 @@ let failed = 0;
 let bytesSent = 0;
 const queue = [...selected];
 
+/**
+ * Taille maximale d'un fragment. Le reverse proxy (Traefik) coupe une requête
+ * au bout de 60 s : à 50 ko/s observés, un visuel hero de 7 Mo n'arrive jamais.
+ * En fractionnant, chaque requête tient largement sous le plafond.
+ */
+const CHUNK_BYTES = 512 * 1024;
+
+async function postWithRetry(url, buffer, headers, attempts = 3) {
+  let lastError;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    try {
+      const response = await fetch(url, { method: "POST", headers, body: buffer });
+      if (response.ok) return response;
+      const text = await response.text().catch(() => "");
+      // 5xx : erreur serveur transitoire, on réessaie. 4xx : requête invalide,
+      // réessayer serait inutile.
+      if (response.status < 500) {
+        throw new Error(`HTTP ${response.status} : ${text.slice(0, 200)}`);
+      }
+      lastError = new Error(`HTTP ${response.status} : ${text.slice(0, 200)}`);
+    } catch (error) {
+      lastError = error;
+      if (error instanceof Error && /HTTP 4\d\d/.test(error.message)) throw error;
+    }
+    if (attempt < attempts) {
+      await new Promise((resolve) => setTimeout(resolve, 800 * attempt));
+    }
+  }
+  throw lastError;
+}
+
 async function uploadOne(entry) {
   const buffer = await readFile(entry.localPath);
-  const response = await fetch(`${BASE}/api/media-import/${entry.target}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": entry.contentType,
-      "x-media-import-token": TOKEN,
-    },
-    body: buffer,
-  });
-  if (!response.ok) {
-    const body = await response.text().catch(() => "");
-    throw new Error(`HTTP ${response.status} pour ${entry.target} : ${body.slice(0, 160)}`);
+  const headers = {
+    "Content-Type": entry.contentType,
+    "x-media-import-token": TOKEN,
+  };
+
+  if (buffer.length <= CHUNK_BYTES) {
+    const response = await postWithRetry(`${BASE}/api/media-import/${entry.target}`, buffer, headers);
+    const payload = await response.json().catch(() => ({}));
+    results.set(entry.target, payload.url);
+  } else {
+    // Envoi fragmenté, puis assemblage par un POST final vide.
+    const chunks = Math.ceil(buffer.length / CHUNK_BYTES);
+    for (let index = 0; index < chunks; index++) {
+      const slice = buffer.subarray(index * CHUNK_BYTES, (index + 1) * CHUNK_BYTES);
+      await postWithRetry(`${BASE}/api/media-import/${entry.target}`, slice, {
+        ...headers,
+        "x-media-part": String(index),
+      });
+    }
+    const response = await postWithRetry(`${BASE}/api/media-import/${entry.target}`, Buffer.alloc(0), headers);
+    const payload = await response.json().catch(() => ({}));
+    results.set(entry.target, payload.url);
   }
-  const payload = await response.json();
-  results.set(entry.target, payload.url);
+
   bytesSent += buffer.length;
   done++;
-  if (done % 100 === 0) console.log(`  ${done}/${selected.length} (${(bytesSent / 1024 / 1024).toFixed(0)} Mo)`);
+  if (done % 50 === 0) console.log(`  ${done}/${selected.length} (${(bytesSent / 1024 / 1024).toFixed(0)} Mo)`);
 }
 
 async function worker() {

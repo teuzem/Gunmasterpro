@@ -20,6 +20,11 @@ ENV PATH=$PNPM_HOME:$PATH
 # Corepack ne doit jamais bloquer sur une invite interactive dans le conteneur :
 # au runtime il n'a plus le cache du build et proposerait de télécharger pnpm.
 ENV COREPACK_ENABLE_DOWNLOAD_PROMPT=0
+# gosu permet de corriger les droits du volume puis de lâcher root sans
+# dépendre de su ou setpriv, absents de l'image slim.
+RUN apt-get update \
+  && apt-get install -y --no-install-recommends gosu \
+  && rm -rf /var/lib/apt/lists/*
 RUN corepack enable && corepack prepare pnpm@10.4.1 --activate
 COPY package.json pnpm-lock.yaml ./
 COPY patches ./patches
@@ -40,7 +45,14 @@ COPY --from=build /app/tools ./tools
 # client/src/lib/homeHeroContent.ts. Sans ce fichier, le seed hero échoue en
 # ERR_MODULE_NOT_FOUND. Seul le dossier lib est repris, pas tout le client.
 COPY --from=build /app/client/src/lib ./client/src/lib
-USER node
+# Point d'entrée : le volume de médias est monté par Docker comme volume nommé,
+# donc créé à vide et propriétaire root (0755). L'application tournant en
+# USER node, toute écriture y échoue (EACCES) — l'import de médias renvoyait
+# alors 500. Un chown effectué pendant le build ne suffit pas : le montage du
+# volume masque le contenu de l'image, permissions comprises. L'entrée corrige
+# donc les droits du volume au démarrage, puis lâche les privilèges root.
+COPY --chmod=755 docker/entrypoint.sh /usr/local/bin/entrypoint.sh
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
 EXPOSE 3000
 HEALTHCHECK --interval=30s --timeout=5s --start-period=30s --retries=3 CMD node -e "fetch('http://127.0.0.1:' + (process.env.PORT || 3000) + '/healthz').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"
 CMD ["node", "dist/index.js"]

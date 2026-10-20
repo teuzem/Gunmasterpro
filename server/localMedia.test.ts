@@ -32,6 +32,27 @@ describe("stockage média local autonome", () => {
     expect(importer).toContain('segment !== ".."');
   });
 
+  it("fractionne les envois pour dépasser le délai du reverse proxy", () => {
+    // Un visuel hero de 7 Mo en un seul POST dépasse le délai de 60 s du proxy
+    // et la connexion est coupée (499). L'import accepte donc des fragments,
+    // dont l'indice passe par l'en-tête x-media-part.
+    const importer = read("server/_core/mediaImport.ts");
+    expect(importer).toContain("x-media-part");
+    expect(importer).toContain("assembleFragments");
+
+    const pusher = read("tools/pushMediaToServer.mjs");
+    expect(pusher).toContain("CHUNK_BYTES");
+    expect(pusher).toContain("x-media-part");
+  });
+
+  it("corrige les droits du volume avant de lâcher root", () => {
+    // Le volume Docker nommé est créé root:root 0755 : sans correction, le
+    // conteneur tournant en USER node ne peut pas y écrire (EACCES, import 500).
+    const entrypoint = read("docker/entrypoint.sh");
+    expect(entrypoint).toContain("chown -R node:node");
+    expect(entrypoint).toContain("gosu node");
+  });
+
   it("déclare le parseur binaire avant express.json", () => {
     const index = read("server/_core/index.ts");
     // Les positions se calculent sur les appels, pas sur les commentaires :
