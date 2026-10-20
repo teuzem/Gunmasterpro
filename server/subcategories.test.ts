@@ -37,7 +37,9 @@ describe("taxonomie des sous-catégories", () => {
         expect(category.labelI18n?.[locale], `${category.slug}/${locale}`).toBeTruthy();
         expect(category.descriptionI18n?.[locale], `${category.slug}/${locale}`).toBeTruthy();
       }
-      expect(category.imageUrl, `${category.slug} sans visuel`).toMatch(/^\/manus-storage\//);
+      // Le visuel pointe vers le stockage local de l'application (/media/*),
+      // servi par le volume persistant : c'est ce que le site affiche.
+      expect(category.imageUrl, `${category.slug} sans visuel`).toMatch(/^\/media\//);
     }
   });
 

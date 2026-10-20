@@ -6,9 +6,13 @@ import { getDb } from "./db";
 export const MEDIA_FALLBACK_URL = "/media-fallback.svg";
 const sourceIdFromSlug = (slug: string) => slug.match(/-(\d+)$/)?.[1] ?? null;
 
+/**
+ * Les visuels sont servis depuis le volume persistant de l'application, sous
+ * /media/*. Un produit dont le visuel est déjà en /media/ n'est jamais remplacé
+ * par le repli : ce repli ne concerne que les fiches qui n'ont pas réellement
+ * de média (transfert en attente ou échec), et il signale un état réel.
+ */
 export const withMediaFallback = <T extends { imageUrl: string; gallery?: string[]; mediaTransferState?: string }>(record: T) => {
-  // Les visuels /media/ sont servis depuis le disque local auto-hébergé :
-  // par construction déjà transférés, jamais remplacés par le repli.
   if (record.mediaTransferState === "complete" || record.imageUrl.startsWith("/media/")) return record;
   return { ...record, imageUrl: MEDIA_FALLBACK_URL, gallery: [MEDIA_FALLBACK_URL], mediaFallback: true };
 };

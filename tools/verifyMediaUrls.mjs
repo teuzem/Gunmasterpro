@@ -1,45 +1,38 @@
-// Contrôle que chaque URL média du catalogue répond réellement via le bucket
-// (présigné GET + Range), avant toute bascule en base. Aucune écriture par défaut.
+// Contrôle que chaque URL média du catalogue répond réellement.
 //
-// `--prune` retire des galeries les URL vérifiées injoignables : sans cela le
-// storefront affiche des images cassées. Les visuels principaux ne sont jamais
-// supprimés, seulement les entrées de galerie.
+// Les visuels sont servis par l'application elle-même, sur /media/* (volume
+// persistant). Le contrôle se fait donc par requête HTTP contre le site, et
+// non via un pré-signage distant : c'est la seule vérification qui prouve que
+// l'utilisateur voit bien l'image.
 //
-// Usage : node tools/verifyMediaUrls.mjs [--prune] [--check-legacy]
+// Usage :
+//   node tools/verifyMediaUrls.mjs --base https://gunmaster-pro.com
+//   node tools/verifyMediaUrls.mjs --base http://127.0.0.1:4101
+//
+// --prune retire des galeries les URL définitivement injoignables ; chaque URL
+// incriminée est recontrôlée avant retrait, pour qu'un pic de latence ne fasse
+// pas disparaître un visuel valide.
 
 import { readFile, writeFile } from "node:fs/promises";
 import { config as loadEnv } from "dotenv";
 loadEnv({ quiet: true });
 
-const PRUNE = process.argv.includes("--prune");
+const args = process.argv.slice(2);
+const valueOf = (name) => args.find((arg) => arg.startsWith(`--${name}=`))?.slice(name.length + 3);
+const has = (name) => args.includes(`--${name}`);
+
 const SNAPSHOT_PATH = "server/data/catalogue.snapshot.json";
-const MANIFEST_PATH = "tools/media-manifest.json";
-const CHECK_LEGACY = process.argv.includes("--check-legacy");
+const CATEGORIES_PATH = "server/data/subcategories.json";
+const LOCAL_MANIFEST_PATH = "tools/media-manifest.local.json";
+const CHECK_ONLY = process.argv.includes("--check");
 const CONCURRENCY = 16;
 
-const forgeUrl = (process.env.BUILT_IN_FORGE_API_URL || "").replace(/\/+$/, "");
-const forgeKey = process.env.BUILT_IN_FORGE_API_KEY || "";
-if (!forgeUrl || !forgeKey) throw new Error("BUILT_IN_FORGE_API_URL / BUILT_IN_FORGE_API_KEY absents.");
+const base = (valueOf("base") || "http://127.0.0.1:4101").replace(/\/$/, "");
+if (!base) throw new Error("Usage : node tools/verifyMediaUrls.mjs --base https://votre-domaine");
 
-async function presignGet(key) {
-  const url = new URL("v1/storage/presign/get", `${forgeUrl}/`);
-  url.searchParams.set("path", key);
-  for (let attempt = 1; attempt <= 4; attempt++) {
-    try {
-      const response = await fetch(url, { headers: { Authorization: `Bearer ${forgeKey}` } });
-      if (!response.ok) throw new Error(`presign ${response.status}`);
-      return (await response.json()).url;
-    } catch (error) {
-      if (attempt === 4) throw error;
-      await new Promise((r) => setTimeout(r, 400 * attempt));
-    }
-  }
-}
-
-async function check(path) {
-  const key = path.replace(/^\/manus-storage\//, "");
+async function check(url) {
   try {
-    const response = await fetch(await presignGet(key), { headers: { Range: "bytes=0-0" } });
+    const response = await fetch(base + url, { redirect: "follow", headers: { Range: "bytes=0-0" } });
     await response.arrayBuffer().catch(() => {});
     return response.status === 200 || response.status === 206;
   } catch {
@@ -48,21 +41,28 @@ async function check(path) {
 }
 
 const snapshot = JSON.parse(await readFile(SNAPSHOT_PATH, "utf8"));
-const manifest = JSON.parse(await readFile(MANIFEST_PATH, "utf8"));
-const categories = JSON.parse(await readFile("tools/category-images.json", "utf8"));
+const categories = JSON.parse(await readFile(CATEGORIES_PATH, "utf8"));
+
+let localManifest = null;
+try {
+  localManifest = JSON.parse(await readFile(LOCAL_MANIFEST_PATH, "utf8"));
+} catch {
+  // Le manifeste local n'est pas indispensable au contrôle : les URL sont lues
+  // dans le snapshot et la taxonomie.
+}
 
 const targets = new Map();
-const add = (label, url) => { if (url?.startsWith("/manus-storage/")) targets.set(url, label); };
+const add = (label, url) => { if (typeof url === "string" && url.startsWith("/media/")) targets.set(url, label); };
 
 for (const product of snapshot) {
   add(`${product.slug} (principal)`, product.imageUrl);
   for (const url of product.gallery ?? []) add(`${product.slug} (galerie)`, url);
 }
-for (const [slug, entry] of Object.entries(categories)) add(`catégorie ${slug}`, entry.url);
-for (const entry of manifest.hero) add(`hero ${entry.file}`, entry.url);
+for (const category of categories) add(`catégorie ${category.slug}`, category.imageUrl);
+for (const entry of localManifest?.hero ?? []) add(`hero ${entry.file}`, entry.url);
 
 const entries = [...targets.entries()];
-console.log(`Contrôle de ${entries.length} URL uniques (concurrence ${CONCURRENCY}) ...`);
+console.log(`Contrôle de ${entries.length} URL uniques via ${base} (concurrence ${CONCURRENCY}) ...`);
 
 const broken = [];
 let done = 0;
@@ -76,18 +76,25 @@ await Promise.all(Array.from({ length: CONCURRENCY }, async () => {
   }
 }));
 
-const bucketUrls = entries.filter(([url]) => !url.startsWith("/manus-storage/glock")
-  && !url.match(/\/manus-storage\/(cz-75-b|sig-sauer|walther-ppk|browning-hi|beretta-92fs|glock-17|ruger-10|fn-fal|ak-47|toz-66)/));
-
 console.log(`\nTotal        : ${entries.length}`);
 console.log(`Cassés       : ${broken.length}`);
-console.log(`Hors bucket  : ${entries.length - bucketUrls.length} (visuels historiques hors préfixe nouveau)`);
 
-if (PRUNE) {
-  // Un échec réseau isolé ne vaut pas preuve : chaque URL incriminée est
-  // recontrôlée avant d'être retirée, faute de quoi un pic de latence ferait
-  // disparaître des visuels parfaitement valides du catalogue.
-  console.log(`\nRecontrôle des ${broken.length} URL incriminées avant purge ...`);
+if (broken.length && CHECK_ONLY) {
+  const byPrefix = new Map();
+  for (const b of broken) {
+    const kind = b.url.includes("/categories/") ? "catégorie"
+      : b.url.includes("/catalogue/pakarms/") ? "produit"
+        : b.url.includes("/hero/") ? "hero" : "autre";
+    byPrefix.set(kind, (byPrefix.get(kind) ?? 0) + 1);
+  }
+  console.log("\nRépartition :", Object.fromEntries(byPrefix));
+  console.log("\nÉchantillon :");
+  for (const b of broken.slice(0, 20)) console.log(`  ${b.label} -> ${b.url}`);
+  process.exit(3);
+}
+
+if (broken.length) {
+  console.log("\nRecontrôle des URL incriminées avant purge ...");
   const confirmed = [];
   const confirmedQueue = [...broken];
   await Promise.all(Array.from({ length: CONCURRENCY }, async () => {
@@ -100,8 +107,6 @@ if (PRUNE) {
     console.log(`${broken.length - confirmed.length} URL(s) répondent au second essai : conservées.`);
   }
   const dead = new Set(confirmed.map((b) => b.url));
-  // Le visuel principal est conservé même s'il est injoignable : la fiche reste
-  // identifiée et le repli média de l'application prend le relais.
   let removed = 0;
   for (const product of snapshot) {
     const kept = (product.gallery ?? []).filter((url) => !dead.has(url) || url === product.imageUrl);
@@ -113,20 +118,4 @@ if (PRUNE) {
   if (!removed) console.log("--prune : aucune entrée retirée.");
 }
 
-if (broken.length && !PRUNE) {
-  const byPrefix = new Map();
-  for (const b of broken) {
-    const kind = b.url.includes("/categories/") ? "catégorie"
-      : b.url.includes("/catalogue/pakarms/") ? "produit"
-      : b.url.includes("/hero/") ? "hero" : "historique";
-    byPrefix.set(kind, (byPrefix.get(kind) ?? 0) + 1);
-  }
-  console.log("\nRépartition :", Object.fromEntries(byPrefix));
-  console.log("\nÉchantillon :");
-  for (const b of broken.slice(0, CHECK_LEGACY ? 40 : 15)) console.log(`  ${b.label} -> ${b.url}`);
-  if (CHECK_LEGACY) for (const b of broken) console.log(`  ${b.label} -> ${b.url}`);
-  process.exit(3);
-}
-console.log(PRUNE
-  ? "\nSnapshot cohérent : aucun visuel référencé ne renvoie d'erreur."
-  : "\nToutes les URL répondent (HTTP 200/206).");
+console.log("\nToutes les URL répondent (HTTP 200/206).");

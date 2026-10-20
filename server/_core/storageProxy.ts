@@ -2,11 +2,12 @@ import fs from "node:fs";
 import path from "node:path";
 import type { Express, Response } from "express";
 import { ENV } from "./env";
-import { LOCAL_MEDIA_URL_PREFIX, localMediaPath } from "../storage";
+import { LOCAL_MEDIA_URL_PREFIX, isLocalStorage, localMediaPath } from "../storage";
 
 const LOCAL_CONTENT_TYPES: Record<string, string> = {
   ".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png",
   ".webp": "image/webp", ".svg": "image/svg+xml", ".avif": "image/avif",
+  ".gif": "image/gif",
 };
 
 function serveLocalFile(res: Response, relKey: string): boolean {
@@ -27,11 +28,12 @@ function serveLocalFile(res: Response, relKey: string): boolean {
 }
 
 export function registerStorageProxy(app: Express) {
-  // Médias auto-hébergés (uploads admin sans Forge) : /media/* sur disque local.
+  // Médias auto-hébergés : /media/* sur le volume persistant du conteneur.
   app.get(`${LOCAL_MEDIA_URL_PREFIX}*`, async (req, res) => {
     const key = (req.params as Record<string, string>)[0];
     if (!key || !serveLocalFile(res, key)) res.status(404).send("Media not found");
   });
+
   app.get("/manus-storage/*", async (req, res) => {
     const key = (req.params as Record<string, string>)[0];
     if (!key) {
@@ -41,8 +43,11 @@ export function registerStorageProxy(app: Express) {
 
     // Migration progressive : un fichier local homonyme prime sur le cloud.
     if (serveLocalFile(res, key)) return;
-    if (!ENV.forgeApiUrl || !ENV.forgeApiKey) {
-      res.status(500).send("Storage proxy not configured");
+
+    // Mode local : aucun service externe n'est configuré, l'objet n'existe pas
+    // localement, donc 404 honnête plutôt qu'une erreur 500.
+    if (isLocalStorage() || !ENV.forgeApiUrl || !ENV.forgeApiKey) {
+      res.status(404).send("Media not found");
       return;
     }
 

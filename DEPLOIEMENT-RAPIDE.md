@@ -350,7 +350,10 @@ Onglet Networking :
 - aucun port publié
 
 Onglet Persistent Storage : le volume `gmp_media` monté sur `/app/data/media`
-est créé par le compose. Ne pas le supprimer.
+est créé par le compose. **Ne pas le supprimer** : il contient les visuels du
+catalogue. Le montage déclaré dans le compose et celui de l'interface Coolify
+portent le même chemin — s'ils se doublent, le conteneur refuse de démarrer ; dans
+ce cas, ne garder que celui du compose et redéployer.
 
 Onglet Deployment lifecycle :
 
@@ -365,6 +368,50 @@ Onglet Deployment lifecycle :
 
 Bouton **Deploy**. Puis vérifier les logs : le build exécute
 `pnpm check && pnpm test && pnpm build`, et un test en échec bloque tout.
+
+---
+
+## 15 bis. Médias : pousser les fichiers dans le volume persistant
+
+Les visuels ne sont plus dans un bucket externe : ils sont écrits dans le volume
+`gmp_media` monté sur `/app/data/media`, et servis par l'application sur
+`/media/*`. La bascule se fait en trois temps.
+
+**1. Variables d'environnement de la ressource application**
+
+```text
+MEDIA_STORAGE_MODE=local
+LOCAL_MEDIA_DIR=/app/data/media
+MEDIA_IMPORT_TOKEN=<openssl rand -hex 32>
+```
+
+`MEDIA_IMPORT_TOKEN` active la route d'import. Sans elle, la route renvoie 404 :
+aucune surface d'écriture n'est exposée.
+
+Redéployer après avoir défini ces variables.
+
+**2. Pousser les 2 177 fichiers depuis le poste de travail**
+
+```bash
+node tools/pushMediaToServer.mjs --base https://gunmaster-pro.com --token <MEDIA_IMPORT_TOKEN>
+```
+
+Le script envoie chaque fichier sur `POST /api/media-import/<clé>` et reçoit
+l'URL publique correspondante. Il produit `tools/media-manifest.local.json`,
+qui fait autorité pour le seed. Vérification préalable sans rien envoyer :
+
+```bash
+node tools/pushMediaToServer.mjs --base https://gunmaster-pro.com --dry-run
+```
+
+**3. Basculer les URL du catalogue**
+
+```bash
+node tools/switchManifestToLocalMedia.mjs
+```
+
+Le snapshot et la taxonomie passent de `/manus-storage/…` à `/media/…`, en
+conservant les mêmes clés.
 
 ---
 

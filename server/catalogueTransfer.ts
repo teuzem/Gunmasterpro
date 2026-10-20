@@ -128,7 +128,8 @@ const parseJsonArray = (value: string, label: string, errors: string[]) => {
   }
 };
 const parseBoolean = (value: unknown) => [true, 1, "1", "true", "vrai", "yes", "oui"].includes(typeof value === "string" ? value.trim().toLowerCase() : value as boolean | number);
-const imagePathIsAllowed = (value: string) => value.startsWith("/manus-storage/") || /^https:\/\//i.test(value);
+const imagePathIsAllowed = (value: string) =>
+  value.startsWith("/media/") || value.startsWith("/manus-storage/") || /^https:\/\//i.test(value);
 
 function productToTransferRow(product: typeof products.$inferSelect): TransferRow {
   return {
@@ -210,7 +211,7 @@ function parseRow(row: Record<string, unknown>, rowNumber: number) {
   const category = required(row, "category", "category", errors) as CatalogueFamily;
   if (category && !families.has(category)) errors.push("« category » doit valoir handguns, rifles, shotguns ou accessories.");
   const imageUrl = required(row, "imageUrl", "imageUrl", errors);
-  if (imageUrl && !imagePathIsAllowed(imageUrl)) errors.push("« imageUrl » doit commencer par https:// ou /manus-storage/.");
+  if (imageUrl && !imagePathIsAllowed(imageUrl)) errors.push("« imageUrl » doit commencer par https://, /media/ ou /manus-storage/.");
   const rights = text(row, "mediaRightsStatus") || "pending";
   if (!rightsStates.has(rights)) errors.push("« mediaRightsStatus » doit valoir pending ou verified.");
   const transfer = text(row, "mediaTransferState") || "pending";

@@ -33,10 +33,17 @@ services:
       CANONICAL_ORIGIN: ${CANONICAL_ORIGIN:?CANONICAL_ORIGIN manquant, ex. https://gunmaster-pro.com}
       SITE_NAME: ${SITE_NAME:-GunsMasterPro}
       # Requis en production : sans ces clés, /manus-storage/* ne sert rien et
-      # le catalogue affiche le repli SVG au lieu des visuels du bucket.
+      # le catalogue affiche le repli SVG au lieu des visuels.
       BUILT_IN_FORGE_API_URL: ${BUILT_IN_FORGE_API_URL:-}
       BUILT_IN_FORGE_API_KEY: ${BUILT_IN_FORGE_API_KEY:-}
+      # Stockage des médias : "local" écrit dans le volume persistant et sert
+      # /media/* ; "forge" utilise le bucket S3 de Manus (défaut si les clés
+      # Forge sont présentes et que MEDIA_STORAGE_MODE n'est pas fixé).
+      MEDIA_STORAGE_MODE: ${MEDIA_STORAGE_MODE:-local}
       LOCAL_MEDIA_DIR: /app/data/media
+      # Jeton de l'import massif de médias (POST /api/media-import/*).
+      # Sans cette variable, la route est désactivée.
+      MEDIA_IMPORT_TOKEN: ${MEDIA_IMPORT_TOKEN:-}
     volumes:
       - gmp_media:/app/data/media
     healthcheck:

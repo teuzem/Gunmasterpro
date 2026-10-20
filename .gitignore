@@ -116,6 +116,14 @@ temp/
 # Webdev artifacts (checkpoint zips, migrations, etc.)
 .webdev/
 
+# Originaux médias du catalogue (environ 1 Go).
+# Ce ne sont pas des sources de code : ils sont poussés une fois dans le volume
+# persistant de l'application par tools/pushMediaToServer.mjs, puis référencés
+# par URL /media/*. Les versionner gonflerait le dépôt sans benefit.
+public/pakarms_catalog_export/
+public/images categories/
+public/images hero section/
+
 # Manus version file (auto-generated, not part of source)
 client/public/__manus__/version.json
 .project-config.json

@@ -5,6 +5,7 @@ import net from "net";
 import { createExpressMiddleware } from "@trpc/server/adapters/express";
 import { registerOAuthRoutes } from "./oauth";
 import { registerStorageProxy } from "./storageProxy";
+import { registerMediaImportRoutes } from "./mediaImport";
 import { registerSeoRoutes } from "../seo";
 import { appRouter } from "../routers";
 import { createContext } from "./context";
@@ -32,10 +33,14 @@ async function findAvailablePort(startPort: number = 3000): Promise<number> {
 export async function createApp(server?: ReturnType<typeof createServer>, app = express()) {
   app.set("trust proxy", 1);
   app.get("/healthz", (_req, res) => res.status(200).json({ ok: true, service: "gunsmasterpro" }));
+  // Corps binaire pour l'import de médias : ce parseur doit être déclaré AVANT
+  // express.json(), qui sinon consomme le flux et rejette un corps non JSON.
+  app.use("/api/media-import", express.raw({ type: "*/*", limit: "64mb" }));
   // Configure body parser with larger size limit for file uploads
   app.use(express.json({ limit: "50mb" }));
   app.use(express.urlencoded({ limit: "50mb", extended: true }));
   registerStorageProxy(app);
+  registerMediaImportRoutes(app);
   registerOAuthRoutes(app);
   registerSeoRoutes(app);
   // tRPC API

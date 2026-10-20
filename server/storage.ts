@@ -1,7 +1,20 @@
-// Stockage hybride : Manus Forge/S3 quand les clés sont configurées,
-// sinon disque local auto-hébergé (LOCAL_MEDIA_DIR, servi via /media/*).
-// Uploads via Forge Server presigned URL to S3 (PUT direct).
-// Downloads return /manus-storage/{key} paths served via 307 redirect.
+// Stockage des médias.
+//
+// Deux modes, choisis par les variables d'environnement :
+//
+//  - LOCAL (défaut) : les fichiers sont écrits sur le disque du conteneur,
+//    dans LOCAL_MEDIA_DIR (volume persistant Coolify), et servis par le proxy
+//    /media/*. Aucune dépendance externe : ni S3, ni Manus, ni Forge.
+//    C'est le mode utilisé en production.
+//
+//  - FORGE : le mode historique, qui délègue le stockage à Manus Forge/S3 via
+//    des URL pré-signées. Sélectionné uniquement si BUILT_IN_FORGE_API_URL et
+//    BUILT_IN_FORGE_API_KEY sont renseignés ET MEDIA_STORAGE_MODE n'est pas
+//    explicitement « local ».
+//
+// Le mode local est prioritaire quand MEDIA_STORAGE_MODE=local : c'est ce qu'un
+// déploiement auto-hébergé souhaite, même si des variables Forge traînent dans
+// l'environnement.
 
 import fs from "node:fs";
 import path from "node:path";
@@ -9,7 +22,24 @@ import { ENV } from "./_core/env";
 
 export const LOCAL_MEDIA_URL_PREFIX = "/media/";
 export const localMediaDir = () => process.env.LOCAL_MEDIA_DIR || "./data/media";
-export const isForgeConfigured = () => Boolean(ENV.forgeApiUrl && ENV.forgeApiKey);
+
+/**
+ * Mode de stockage effectif.
+ * - "local"  : disque du conteneur (volume persistant), servi via /media/*
+ * - "forge"  : Manus Forge / S3, servi via /manus-storage/*
+ */
+export function storageMode(): "local" | "forge" {
+  const forced = (process.env.MEDIA_STORAGE_MODE || "").trim().toLowerCase();
+  if (forced === "local") return "local";
+  if (forced === "forge") return "forge";
+  return ENV.forgeApiUrl && ENV.forgeApiKey ? "forge" : "local";
+}
+
+export const isLocalStorage = () => storageMode() === "local";
+export const isForgeConfigured = () => storageMode() === "forge";
+
+/** Préfixe d'URL public correspondant au mode courant. */
+export const mediaUrlPrefix = () => (isLocalStorage() ? LOCAL_MEDIA_URL_PREFIX : "/manus-storage/");
 
 function sanitizeLocalKey(relKey: string): string {
   const key = normalizeKey(relKey).replace(/\\/g, "/");
@@ -47,19 +77,30 @@ function appendHashSuffix(relKey: string): string {
   return `${relKey.slice(0, lastDot)}_${hash}${relKey.slice(lastDot)}`;
 }
 
+/**
+ * Écrit un média sur le disque local et renvoie son URL publique /media/*.
+ * La clé est normalisée (pas d'espace ni de caractère accentué : ces caractères
+ *cassent l'URL et le pré-signage).
+ */
+export async function putLocalMedia(relKey: string, data: Buffer | Uint8Array | string, contentType = "application/octet-stream") {
+  const key = sanitizeLocalKey(relKey);
+  const filePath = localMediaPath(key);
+  await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
+  await fs.promises.writeFile(filePath, typeof data === "string" ? Buffer.from(data) : Buffer.from(data as Uint8Array));
+  return { key, url: `${LOCAL_MEDIA_URL_PREFIX}${key}` };
+}
+
 export async function storagePut(
   relKey: string,
   data: Buffer | Uint8Array | string,
   contentType = "application/octet-stream",
 ): Promise<{ key: string; url: string }> {
-  // Mode autonome (Coolify/local sans Forge) : écriture sur disque local.
-  if (!isForgeConfigured()) {
+  // Mode local : écriture directe sur le volume persistant.
+  if (isLocalStorage()) {
     const key = appendHashSuffix(sanitizeLocalKey(relKey));
-    const filePath = localMediaPath(key);
-    await fs.promises.mkdir(path.dirname(filePath), { recursive: true });
-    await fs.promises.writeFile(filePath, typeof data === "string" ? Buffer.from(data) : Buffer.from(data as Uint8Array));
-    return { key, url: `${LOCAL_MEDIA_URL_PREFIX}${key}` };
+    return putLocalMedia(key, data, contentType);
   }
+
   const { forgeUrl, forgeKey } = getForgeConfig();
   const key = appendHashSuffix(normalizeKey(relKey));
 
@@ -100,10 +141,14 @@ export async function storagePut(
 
 export async function storageGet(relKey: string): Promise<{ key: string; url: string }> {
   const key = normalizeKey(relKey);
-  return { key, url: `/manus-storage/${key}` };
+  return { key, url: `${mediaUrlPrefix()}${key}` };
 }
 
 export async function storageGetSignedUrl(relKey: string): Promise<string> {
+  if (isLocalStorage()) {
+    // En mode local, l'URL publique est directe : pas de signature à produire.
+    return `${mediaUrlPrefix()}${normalizeKey(relKey)}`;
+  }
   const { forgeUrl, forgeKey } = getForgeConfig();
   const key = normalizeKey(relKey);
 

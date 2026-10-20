@@ -1,4 +1,5 @@
 import "dotenv/config";
+import { readFile } from "node:fs/promises";
 import mysql from "mysql2/promise";
 
 if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL unavailable");
@@ -12,28 +13,7 @@ if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL unavailable");
 // bucket : aucune slide n'est insérée avec une URL morte.
 const skipHero = process.argv.includes("--skip-hero");
 
-const heroAssets = [
-  ["semi-auto-handguns", "/manus-storage/hero/01_Semi_Auto_Handguns_Studio_Tactical_d3550a04.png"],
-  ["revolvers", "/manus-storage/hero/02_Revolvers_Collector_Studio_7de5f843.png"],
-  ["single-shot-handguns", "/manus-storage/hero/03_Single_Shot_Handguns_Craftsmanship_08665fb3.png"],
-  ["other-handguns", "/manus-storage/hero/04_Other_Handguns_Editorial_Display_4a384869.png"],
-  ["semi-auto-rifles", "/manus-storage/hero/05_Semi_Auto_Rifles_Controlled_Range_c5e14033.png"],
-  ["bolt-action-rifles", "/manus-storage/hero/06_Bolt_Action_Rifles_Precision_Bench_fd219d0a.png"],
-  ["lever-action-rifles", "/manus-storage/hero/07_Lever_Action_Rifles_Heritage_Lodge_d4b7cb64.png"],
-  ["pump-action-rifles", "/manus-storage/hero/08_Pump_Action_Rifles_Outdoor_Shelter_001890b3.png"],
-  ["single-shot-rifles", "/manus-storage/hero/09_Single_Shot_Rifles_Alpine_Studio_60b78323.png"],
-  ["other-rifles", "/manus-storage/hero/10_Other_Rifles_Innovation_Lab_3ffee40e.png"],
-  ["semi-auto-shotguns", "/manus-storage/hero/11_Semi_Auto_Shotguns_Sporting_Club_a907ec53.png"],
-  ["pump-action-shotguns", "/manus-storage/hero/12_Pump_Action_Shotguns_Training_Bay_901c0e70.png"],
-  ["side-by-side-shotguns", "/manus-storage/hero/13_Side_By_Side_Shotguns_Heritage_57ab8c75.png"],
-  ["over-under-shotguns", "/manus-storage/hero/14_Over_Under_Shotguns_Clay_Club_72ea788a.png"],
-  ["single-shot-shotguns", "/manus-storage/hero/15_Single_Shot_Shotguns_Artisan_Bench_f89e2c9b.png"],
-  ["accessories", "/manus-storage/hero/16_Accessories_Professional_Kit_025fba0f.png"],
-  ["magazines", "/manus-storage/hero/17_Magazines_Secure_Storage_ea02d501.png"],
-  ["optics", "/manus-storage/hero/18_Optics_Field_Observation_e5dac6f4.png"],
-  ["suppressors", "/manus-storage/hero/19_Suppressors_Technical_Display_79ad2d6b.png"],
-  ["collectible-firearms", "/manus-storage/hero/20_Collectible_Firearms_Museum_de97d499.png"],
-];
+
 
 const keyFromUrl = (url) => url.replace("/manus-storage/", "");
 const contentType = (url) => url.endsWith(".png") ? "image/png" : url.endsWith(".jpg") ? "image/jpeg" : "image/webp";
@@ -70,10 +50,17 @@ try {
   };
   const familyLabels = { handguns: "Armes de poing", rifles: "Carabines", shotguns: "Fusils", accessories: "Accessoires" };
 
-  for (const [index, [, imageUrl]] of heroAssets.entries()) {
+  // Les URL proviennent du manifeste local (poussée vers le volume
+  // persistant) : /media/hero/… et non plus /manus-storage/hero/….
+  const localHero = JSON.parse(await readFile("tools/media-manifest.local.json", "utf8"));
+  const localHeroUrls = (localHero.hero ?? []).map((entry) => entry.url);
+  if (!localHeroUrls.length) {
+    throw new Error("tools/media-manifest.local.json est vide — lancez tools/pushMediaToServer.mjs.");
+  }
+
+  for (const [index, imageUrl] of localHeroUrls.entries()) {
     if (skipHero) break;
     const family = familyByImage[index + 1] ?? "accessories";
-    if (!categoryBySlug.size) throw new Error("catalogueCategories est vide — lancez d'abord tools/seedCatalogueMedia.mjs.");
     const copy = heroCopy(familyLabels[family]);
     await connection.execute(
       "INSERT INTO homeHeroSlides (position, categorySlug, targetPath, storageKey, imageUrl, altText, eyebrow, title, description, ctaLabel, isActive) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, true) ON DUPLICATE KEY UPDATE categorySlug = VALUES(categorySlug), targetPath = VALUES(targetPath), storageKey = VALUES(storageKey), imageUrl = VALUES(imageUrl), altText = VALUES(altText), eyebrow = VALUES(eyebrow), title = VALUES(title), description = VALUES(description), ctaLabel = VALUES(ctaLabel), isActive = true",
@@ -83,7 +70,7 @@ try {
 
   await connection.commit();
   console.log(JSON.stringify({
-    heroSlides: skipHero ? 0 : heroAssets.length,
+    heroSlides: skipHero ? 0 : localHeroUrls.length,
     skippedHero: skipHero,
   }));
 } catch (error) {

@@ -1,14 +1,16 @@
-// Seed média complet et transactionnel : réaligne le catalogue en base sur le
-// snapshot (visuels réellement téléversés) et sur les manifestes.
+// Réaligne la base sur les médias réellement présents dans le volume persistant.
 //
-// Couvre ce que `pnpm db:seed` ne fait pas :
-//   - rafraîchit les lignes existantes (ensureCatalogueImported court-circuite
-//     quand le compte de produits est déjà complet) ;
-//   - écrit les mediaAssets avec storageKey / storageUrl / contentType en
-//     'transferred', l'import applicatif ne renseignant que sourceUrl 'pending' ;
-//   - supprime les mediaAssets orphelins dont l'URL n'existe plus dans le bucket.
+// Source des URL : tools/media-manifest.local.json, produit par
+// tools/pushMediaToServer.mjs après poussée des fichiers vers l'application.
+// Le manifeste local est prioritaire ; le manifeste Forge n'est lu qu'à titre
+// de repli, pour un déploiement qui n'aurait pas encore fait la migration.
 //
-// Toutes les URL ont été contrôlées beforehand par tools/verifyMediaUrls.mjs.
+// Écrit, en une transaction :
+//   - catalogueCategories : les 14 sous-catégories et leur visuel
+//   - products            : visuel principal + galerie complète, mediaTransferState
+//   - mediaAssets         : une ligne par visuel, clé et type inclus
+//   - homeHeroSlides      : les 20 diapositives hero
+//
 // Usage : node tools/seedCatalogueMedia.mjs [--dry-run]
 
 import "dotenv/config";
@@ -19,10 +21,25 @@ const DRY_RUN = process.argv.includes("--dry-run");
 if (!process.env.DATABASE_URL) throw new Error("DATABASE_URL unavailable");
 
 const snapshot = JSON.parse(await readFile("server/data/catalogue.snapshot.json", "utf8"));
-const manifest = JSON.parse(await readFile("tools/media-manifest.json", "utf8"));
 // Taxonomie en vigueur : 14 sous-catégories réelles, pas les 23 anciens
 // libellés par type d'action (tools/applySubcategories.mjs).
 const categories = JSON.parse(await readFile("server/data/subcategories.json", "utf8"));
+
+const readJson = async (path) => {
+  try {
+    return JSON.parse(await readFile(path, "utf8"));
+  } catch {
+    return null;
+  }
+};
+const localManifest = await readJson("tools/media-manifest.local.json");
+const forgeManifest = await readJson("tools/media-manifest.json");
+
+if (!localManifest) {
+  console.error("tools/media-manifest.local.json absent : exécutez d'abord tools/pushMediaToServer.mjs.");
+  process.exit(3);
+}
+void forgeManifest;
 
 const MEDIA_SOURCE = "Export catalogue PAK Arms (pakarms.co) — 19 août 2026";
 const CATEGORY_SOURCE = "Archives visuelles fournies par le propriétaire — 23 août 2026";
@@ -32,13 +49,18 @@ const contentTypeOf = (url) =>
       : url.endsWith(".webp") ? "image/webp"
         : url.endsWith(".avif") ? "image/avif" : "application/octet-stream";
 const sourceIdOf = (slug) => slug.match(/-(\d+)$/)?.[1] ?? null;
-const keyOf = (url) => url.replace(/^\/manus-storage\//, "");
+const keyOf = (url) => url.replace(/^\/(?:manus-storage|media)\//, "");
 
-// Le manifest média donne, pour chaque URL, la clé et le type réellement
-// téléversés ; à défaut, on retombe sur l'URL elle-même.
-const assetByUrl = new Map();
-for (const product of Object.values(manifest.products ?? {})) {
-  for (const file of product.files ?? []) assetByUrl.set(file.url, { key: file.key, contentType: file.contentType });
+// URL par cible : le même contenu peut servir plusieurs produits.
+const urlByProductFile = new Map();
+for (const product of Object.values(localManifest.products ?? {})) {
+  for (const file of product.files ?? []) urlByProductFile.set(`${product.slug}::${file.file}`, file);
+}
+const urlByCategorySlug = new Map((localManifest.categories ?? []).map((entry) => [entry.slug, entry]));
+
+/** URL locale du visuel d'un produit, à partir de son nom de fichier source. */
+function localUrlForProductFile(slug, fileName) {
+  return urlByProductFile.get(`${slug}::${fileName}`)?.url;
 }
 
 const connection = await mysql.createConnection({ uri: process.env.DATABASE_URL });
@@ -48,10 +70,9 @@ try {
   await connection.beginTransaction();
 
   // --- Catégories -----------------------------------------------------------
-  // Les 14 sous-catégories sont insérées (et non mis à jour) : la taxonomie a
-  // changé, les anciennes lignes par type d'action doivent disparaître, sinon
-  // le storefront afficherait des catégories sans produit.
   for (const category of categories) {
+    const entry = urlByCategorySlug.get(category.slug);
+    if (!entry) throw new Error(`Aucun visuel local pour la catégorie ${category.slug}`);
     await connection.execute(
       `INSERT INTO catalogueCategories
          (slug, parentCategory, label, description, imageUrl, mediaSource, mediaRightsStatus, position)
@@ -61,27 +82,59 @@ try {
          description = VALUES(description), imageUrl = VALUES(imageUrl),
          mediaSource = VALUES(mediaSource), mediaRightsStatus = VALUES(mediaRightsStatus),
          position = VALUES(position)`,
-      [
-        category.slug, category.parentCategory, category.label, category.description,
-        category.imageUrl, CATEGORY_SOURCE, category.position,
-      ],
+      [category.slug, category.parentCategory, category.label, category.description, entry.url, CATEGORY_SOURCE, category.position],
     );
     summary.categoriesTouched = (summary.categoriesTouched ?? 0) + 1;
   }
 
   // Retrait des catégories obsolètes (ancienne taxonomie par type d'action).
-  const obsolete = ["semi-auto-handguns", "revolvers", "single-shot-handguns", "other-handguns", "semi-auto-rifles", "bolt-action-rifles", "lever-action-rifles", "pump-action-rifles", "single-shot-rifles", "other-rifles", "semi-auto-shotguns", "pump-action-shotguns", "side-by-side-shotguns", "over-under-shotguns", "single-shot-shotguns", "other-shotguns", "accessories", "magazines", "optics", "suppressors", "collectible-firearms", "black-powder-muzzleloaders", "other-accessories"];
-  const liveSlugs = new Set(categories.map((c) => c.slug));
-  const toRemove = obsolete.filter((slug) => !liveSlugs.has(slug));
-  for (const slug of toRemove) await connection.execute("DELETE FROM catalogueCategories WHERE slug = ?", [slug]);
-  summary.categoriesRemoved = toRemove.length;
+  const liveSlugs = new Set(categories.map((category) => category.slug));
+  const [existingCategories] = await connection.query("SELECT slug FROM catalogueCategories");
+  const obsolete = existingCategories
+    .map((row) => row.slug)
+    .filter((slug) => !liveSlugs.has(slug));
+  for (const slug of obsolete) await connection.execute("DELETE FROM catalogueCategories WHERE slug = ?", [slug]);
+  summary.categoriesRemoved = obsolete.length;
 
   // --- Produits -------------------------------------------------------------
-  let productsTouched = 0;
+  // Le visuel principal et la galerie proviennent du manifeste local : le
+  // snapshot est réaligné dessus, fichier par fichier.
+  let productsWritten = 0;
+  let galleryTotal = 0;
+  const missing = [];
+
   for (const product of snapshot) {
-    const gallery = JSON.stringify(Array.isArray(product.gallery) ? product.gallery : []);
+    const manifestProduct = localManifest.products?.[product.slug];
+    if (!manifestProduct?.files?.length) {
+      missing.push(product.slug);
+      continue;
+    }
+
+    // Le snapshot donne l'ordre éditorial des médias ; on le respecte et on
+    // remplace chaque URL par son équivalent local.
+    const ordered = [];
+    for (const url of product.gallery ?? []) {
+      const fileName = url.split("/").pop();
+      const local = localUrlForProductFile(product.slug, fileName ?? "");
+      if (local) ordered.push(local);
+    }
+    // Tout visuel du manifeste non encore listé est ajouté à la fin.
+    const listed = new Set(ordered);
+    for (const file of manifestProduct.files) {
+      if (!listed.has(file.url)) ordered.push(file.url);
+    }
+
+    if (!ordered.length) {
+      missing.push(product.slug);
+      continue;
+    }
+
+    const imageUrl = ordered[0];
+    const gallery = ordered;
+    galleryTotal += gallery.length;
+
     const specifications = JSON.stringify(product.specifications ?? {});
-    const [result] = await connection.execute(
+    await connection.execute(
       `INSERT INTO products
          (sourceId, slug, name, brand, category, subCategory, manufacturer, model, excerpt, description,
           referencePriceCents, priceCents, stock, caliber, material, capacity, action, barrelLength,
@@ -107,16 +160,22 @@ try {
         product.caliber || "Non communiqué", product.material || "Non communiqué",
         product.capacity || "Non communiqué", product.action || "Non communiqué",
         product.barrelLength || "Non communiqué", product.overallLength || "Non communiqué",
-        product.weight || "Non communiqué", product.imageUrl, gallery, specifications,
+        product.weight || "Non communiqué", imageUrl, JSON.stringify(gallery), specifications,
         product.mediaSource ?? MEDIA_SOURCE, product.mediaRightsStatus ?? "verified",
         product.featured ? 1 : 0,
       ],
     );
-    productsTouched += result.affectedRows ? 1 : 0;
+    productsWritten++;
   }
-  summary.productsWritten = productsTouched;
+  summary.productsWritten = productsWritten;
+  summary.galleryTotal = galleryTotal;
 
-  // --- mediaAssets : une ligne par visuel, clé et type inclus ---------------
+  if (missing.length) {
+    console.error(`Produits sans média local (${missing.length}) : ${missing.slice(0, 10).join(", ")}`);
+    throw new Error("Import incomplet : médias manquants pour une partie du catalogue.");
+  }
+
+  // --- mediaAssets : une ligne par visuel ------------------------------------
   const [persisted] = await connection.query("SELECT id, sourceId FROM products");
   const productIdBySourceId = new Map(
     persisted.flatMap((row) => (row.sourceId ? [[row.sourceId, row.id]] : [])),
@@ -124,9 +183,11 @@ try {
 
   const expectedUrls = new Set();
   let mediaWritten = 0;
+
   for (const category of categories) {
-    if (!category.imageUrl) continue;
-    expectedUrls.add(category.imageUrl);
+    const entry = urlByCategorySlug.get(category.slug);
+    if (!entry) continue;
+    expectedUrls.add(entry.url);
     await connection.execute(
       `INSERT INTO mediaAssets
          (categorySlug, kind, position, sourceUrl, storageKey, storageUrl, contentType, transferStatus, attemptCount)
@@ -136,7 +197,7 @@ try {
          storageKey = VALUES(storageKey), storageUrl = VALUES(storageUrl),
          contentType = VALUES(contentType), transferStatus = 'transferred',
          attemptCount = 1, lastError = NULL`,
-      [category.slug, category.imageUrl, keyOf(category.imageUrl), category.imageUrl, contentTypeOf(category.imageUrl)],
+      [category.slug, entry.url, keyOf(entry.url), entry.url, entry.contentType ?? contentTypeOf(entry.url)],
     );
     mediaWritten++;
   }
@@ -144,10 +205,11 @@ try {
   for (const product of snapshot) {
     const productId = productIdBySourceId.get(sourceIdOf(product.slug));
     if (!productId) continue;
-    const urls = Array.from(new Set([product.imageUrl, ...(product.gallery ?? [])]));
+    const manifestProduct = localManifest.products?.[product.slug];
+    const urls = Array.from(new Set([product.imageUrl, ...(product.gallery ?? [])].filter(Boolean)));
     for (const [position, url] of urls.entries()) {
       expectedUrls.add(url);
-      const asset = assetByUrl.get(url);
+      const file = manifestProduct?.files?.find((entry) => entry.url === url);
       await connection.execute(
         `INSERT INTO mediaAssets
            (productId, kind, position, sourceUrl, storageKey, storageUrl, contentType, transferStatus, attemptCount)
@@ -159,7 +221,7 @@ try {
            attemptCount = 1, lastError = NULL`,
         [
           productId, position === 0 ? "primary" : "gallery", position, url,
-          keyOf(url), url, asset?.contentType ?? contentTypeOf(url),
+          keyOf(url), url, file?.contentType ?? contentTypeOf(url),
         ],
       );
       mediaWritten++;
@@ -167,13 +229,11 @@ try {
   }
   summary.mediaWritten = mediaWritten;
 
-  // --- Nettoyage des visuels retirés du catalogue --------------------------
+  // --- Nettoyage des visuels retirés du catalogue ---------------------------
   if (!DRY_RUN) {
     const [orphanRows] = await connection.query("SELECT id, sourceUrl FROM mediaAssets");
     const orphans = orphanRows.filter((row) => !expectedUrls.has(row.sourceUrl));
-    for (const orphan of orphans) {
-      await connection.execute("DELETE FROM mediaAssets WHERE id = ?", [orphan.id]);
-    }
+    for (const orphan of orphans) await connection.execute("DELETE FROM mediaAssets WHERE id = ?", [orphan.id]);
     summary.mediaOrphansRemoved = orphans.length;
   }
 
