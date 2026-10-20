@@ -24,11 +24,46 @@ import path from "node:path";
 import process from "node:process";
 
 const args = process.argv.slice(2);
-const valueOf = (name) => args.find((arg) => arg.startsWith(`--${name}=`))?.slice(name.length + 3);
-const has = (name) => args.includes(`--${name}`);
+
+/**
+ * Analyse d'arguments tolérante : accepte --nom=valeur, --nom valeur, et un
+ * jeton passé en positionnel (forme naturelle : « --base https://… <TOKEN> »).
+ */
+function parseArgs(argv) {
+  const flags = new Set();
+  const options = new Map();
+  const positional = [];
+  for (let index = 0; index < argv.length; index++) {
+    const argument = argv[index];
+    if (!argument.startsWith("--")) {
+      positional.push(argument);
+      continue;
+    }
+    const equals = argument.indexOf("=");
+    if (equals !== -1) {
+      options.set(argument.slice(2, equals), argument.slice(equals + 1));
+      continue;
+    }
+    const name = argument.slice(2);
+    const next = argv[index + 1];
+    if (next !== undefined && !next.startsWith("--")) {
+      options.set(name, next);
+      index++;
+    } else {
+      flags.add(name);
+    }
+  }
+  return { flags, options, positional };
+}
+
+const { flags, options, positional } = parseArgs(args);
+const valueOf = (name) => options.get(name);
+const has = (name) => flags.has(name);
 
 const BASE = (valueOf("base") || "").replace(/\/$/, "");
-const TOKEN = valueOf("token") || process.env.MEDIA_IMPORT_TOKEN || "";
+// Le jeton peut venir de --token, de la variable d'environnement, ou être passé
+// en dernier argument positionnel.
+const TOKEN = valueOf("token") || process.env.MEDIA_IMPORT_TOKEN || positional[0] || "";
 const DRY_RUN = has("dry-run");
 const ONLY = valueOf("only");
 const CONCURRENCY = 6;
@@ -39,7 +74,19 @@ const HERO_DIR = "public/images hero section";
 const OUTPUT = "tools/media-manifest.local.json";
 
 if (!BASE && !DRY_RUN) {
-  throw new Error("Usage : node tools/pushMediaToServer.mjs --base https://votre-domaine --token <TOKEN>");
+  throw new Error(
+    "Usage : node tools/pushMediaToServer.mjs --base https://votre-domaine --token <TOKEN>\n" +
+    "   ou : node tools/pushMediaToServer.mjs --base https://votre-domaine <TOKEN>",
+  );
+}
+if (!TOKEN && !DRY_RUN) {
+  throw new Error(
+    "Jeton manquant : précisez --token <TOKEN>, ou définissez MEDIA_IMPORT_TOKEN.\n" +
+    "Le jeton doit correspondre à MEDIA_IMPORT_TOKEN configuré sur la ressource application.",
+  );
+}
+if (TOKEN && !/^[A-Za-z0-9._-]+$/.test(TOKEN)) {
+  throw new Error("Le jeton ne doit contenir que des lettres, chiffres, point, tiret et underscore.");
 }
 
 const manifest = JSON.parse(await readFile("tools/media-manifest.json", "utf8"));
