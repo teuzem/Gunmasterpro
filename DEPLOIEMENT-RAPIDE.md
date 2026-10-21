@@ -396,6 +396,11 @@ Redéployer après avoir défini ces variables.
 node tools/pushMediaToServer.mjs --base https://gunmaster-pro.com --token <MEDIA_IMPORT_TOKEN>
 ```
 
+> **Cette commande se lance depuis votre machine, pas depuis le conteneur.** Les
+> fichiers originaux vivent dans `public/`, volontairement exclu de l'image Docker
+> pour ne pas y embarquer près d'un giga-octet. Lancée dans le conteneur, elle
+> échoue avec un message explicite.
+
 Le script envoie chaque fichier sur `POST /api/media-import/<clé>` et reçoit
 l'URL publique correspondante. Il produit `tools/media-manifest.local.json`,
 qui fait autorité pour le seed. Vérification préalable sans rien envoyer :

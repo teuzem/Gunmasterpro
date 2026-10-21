@@ -20,6 +20,7 @@
 
 import { createHash } from "node:crypto";
 import { readFile, readdir, stat, writeFile } from "node:fs/promises";
+import { existsSync } from "node:fs";
 import path from "node:path";
 import process from "node:process";
 
@@ -90,6 +91,33 @@ if (TOKEN && !/^[A-Za-z0-9._-]+$/.test(TOKEN)) {
   throw new Error("Le jeton ne doit contenir que des lettres, chiffres, point, tiret et underscore.");
 }
 
+/**
+ * Les fichiers sources vivent sur le poste de travail : ils sont
+ * volontairement exclus de l'image Docker (voir .dockerignore). Lancer ce script
+ * depuis le conteneur est donc impossible, et l'erreur de lecture de dossier
+ * serait trompeuse. On le dit explicitement, avant toute lecture.
+ */
+const REQUIRED_PATHS = [
+  { path: "tools/media-manifest.json", label: "manifeste média" },
+  { path: "tools/media-manifest.local.json", label: "manifeste média local" },
+  { path: "tools/category-images.json", label: "manifeste des catégories" },
+  { path: PRODUCT_ROOT, label: "visuels produits (export PAK Arms)" },
+  { path: CATEGORY_DIR, label: "visuels de catégories" },
+  { path: HERO_DIR, label: "visuels hero" },
+];
+const missingPaths = REQUIRED_PATHS.filter((entry) => !existsSync(entry.path));
+if (missingPaths.length) {
+  console.error("Les originaux ne sont pas accessibles depuis ce répertoire :\n");
+  for (const entry of missingPaths) console.error(`  - ${entry.path}  (${entry.label})`);
+  console.error(
+    "\nCe script s'exécute depuis le poste de travail, là où se trouvent les fichiers originaux.\n" +
+    "Dans le conteneur, ces dossiers sont absents : le .dockerignore exclut public/ pour ne pas\n" +
+    "embarquer près d'un giga-octet d'originaux dans l'image.\n" +
+    "Revenez sur votre machine et relancez la commande depuis la racine du dépôt.",
+  );
+  process.exit(3);
+}
+
 const manifest = JSON.parse(await readFile("tools/media-manifest.json", "utf8"));
 const categoryManifest = JSON.parse(await readFile("tools/category-images.json", "utf8"));
 // Le manifeste local fait autorité : il porte les clés définitives, y compris
@@ -126,7 +154,6 @@ const productDirs = new Map(
     .filter((entry) => entry.isDirectory())
     .map((entry) => [entry.name.split("_")[0], entry.name]),
 );
-
 for (const [slug, product] of Object.entries(manifest.products)) {
   const sourceId = slug.match(/-(\d+)$/)?.[1];
   const dir = sourceId ? productDirs.get(sourceId) : undefined;
@@ -166,7 +193,6 @@ const count = (family) => selected.filter((entry) => entry.family === family).le
 console.log(
   `Plan : ${selected.length} fichiers (hero ${count("hero")}, catégories ${count("categories")}, produits ${count("products")}, historiques ${count("historical")})`,
 );
-
 if (DRY_RUN) {
   let bytes = 0;
   for (const entry of selected) bytes += (await stat(entry.localPath)).size;
