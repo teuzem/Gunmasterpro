@@ -60,6 +60,8 @@ export default function ProductDetail() {
   const specs = [[t.product.manufacturer, product.manufacturer ?? product.brand], [t.product.model, product.model ?? product.name], [t.catalogue.caliber, product.caliber], [t.catalogue.material, product.material], [t.product.capacity, product.capacity], [t.product.actionLabel, product.action], [t.product.barrel, product.barrelLength], [t.product.length, product.overallLength], [t.product.weight, product.weight], [t.product.subCategory, product.subCategory], ...Object.entries(product.specifications ?? {}).filter(([key]) => !isInternalMediaOrSourceField(key))].filter(([, value]) => isUsableSpecification(value));
   const similar = ((catalogue.data ?? []) as StoreProduct[]).filter((item) => item.category === product.category && item.id !== product.id).slice(0, 3);
   const average = product.reviewCount ? (product.ratingCenti ?? 0) / 100 : null;
+  // Attribution des visuels sous licence libre : obligatoire pour CC BY / CC BY-SA.
+  const creditNotices = product.mediaCredits?.notices ?? [];
   const compared = compareIds.includes(product.id);
   const stockState = product.stock < 1 ? "out" : product.stock <= 3 ? "low" : "available";
   const stockLabel = stockState === "out" ? t.product.outOfStock : stockState === "low" ? t.product.lowStock : t.product.stock;
@@ -100,6 +102,7 @@ export default function ProductDetail() {
           </div>
           <div className="mt-3 grid grid-cols-4 gap-2 sm:grid-cols-6">{gallery.map((image, index) => <button key={`${image}-${index}`} type="button" onClick={() => setImageIndex(index)} className={`overflow-hidden rounded-xl border bg-[#0b151d] transition ${imageIndex === index ? "border-[#d7b46a] ring-2 ring-[#d7b46a]/25" : "border-white/10 hover:border-white/35"}`} aria-label={`${t.product.gallery} ${index + 1}`} aria-pressed={imageIndex === index}><img src={image} alt={`${product.name} — ${t.product.gallery} ${index + 1}`} loading="lazy" decoding="async" width="300" height="300" className="aspect-square h-full w-full object-cover"/></button>)}</div>
           <div className="mt-5 grid gap-3 sm:grid-cols-3"><div className="product-trust-card"><ShieldCheck/><span>{copy.trustOne}</span></div><div className="product-trust-card"><Check/><span>{copy.trustTwo}</span></div><div className="product-trust-card"><PackageCheck/><span>{copy.trustThree}</span></div></div>
+          {creditNotices.length > 0 && <p className="mt-3 text-[11px] leading-5 text-slate-500">{t.product.credits} {creditNotices.join(" · ")}</p>}
           <div className="product-reference-dossier"><span>{copy.dossier}</span><div><p>{copy.reference}<strong>{product.slug}</strong></p><p>{copy.availability}<strong className={`product-stock-detail is-${stockState}`}>{product.stock > 0 ? `${product.stock} ${t.product.availabilityCount}` : t.product.outOfStock}</strong></p></div></div>
         </section>
         <aside className="gmp-card product-purchase-panel min-w-0 rounded-3xl border border-white/8 bg-[#0d1820] p-5 sm:p-7 xl:sticky xl:top-28">

@@ -16,9 +16,11 @@
     "barrelLength": "114 mm",
     "overallLength": "202 mm",
     "weight": "625 g",
-    "imageUrl": "/media/glock-17_b57cd29d.png",
+    "imageUrl": "/media/catalogue/pakarms/5163/h1_01_5165_486e2a09_5685_4af9_a3b6_bc7475db898b.jpeg",
     "gallery": [
-      "/media/glock-17_b57cd29d.png"
+      "/media/catalogue/pakarms/5163/h1_01_5165_486e2a09_5685_4af9_a3b6_bc7475db898b.jpeg",
+      "/media/catalogue/pakarms/5163/h2_02_5166_78a6fe76_88ee_473d_844c_0eb32d6b5a99.jpeg",
+      "/media/catalogue/pakarms/5163/h3_03_5167_1f90a65e_38ea_4379_801f_67dcfce1870d.jpeg"
     ],
     "manufacturer": "Glock",
     "model": "17 Gen5",
@@ -30,7 +32,7 @@
     },
     "ratingCenti": 0,
     "reviewCount": 0,
-    "mediaSource": "Wikimedia Commons — licences vérifiées et attributions enregistrées",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
     "mediaRightsStatus": "verified",
     "featured": true
   },
@@ -51,9 +53,11 @@
     "barrelLength": "114 mm",
     "overallLength": "206 mm",
     "weight": "1 000 g",
-    "imageUrl": "/media/cz-75_45d40775.jpg",
+    "imageUrl": "/media/catalogue/historique/cz-75-b/01.jpg",
     "gallery": [
-      "/media/cz-75_45d40775.jpg"
+      "/media/catalogue/historique/cz-75-b/01.jpg",
+      "/media/catalogue/historique/cz-75-b/02.jpg",
+      "/media/catalogue/historique/cz-75-b/03.jpg"
     ],
     "manufacturer": "Česká zbrojovka",
     "model": "75 B",
@@ -65,7 +69,7 @@
     },
     "ratingCenti": 0,
     "reviewCount": 0,
-    "mediaSource": "Wikimedia Commons — licences vérifiées et attributions enregistrées",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
     "mediaRightsStatus": "verified",
     "featured": true
   },
@@ -86,9 +90,11 @@
     "barrelLength": "112 mm",
     "overallLength": "196 mm",
     "weight": "964 g",
-    "imageUrl": "/media/sig-sauer-p226-legion_fe14a7be.jpg",
+    "imageUrl": "/media/catalogue/historique/sig-sauer-p226-legion/01.jpg",
     "gallery": [
-      "/media/sig-sauer-p226-legion_fe14a7be.jpg"
+      "/media/catalogue/historique/sig-sauer-p226-legion/01.jpg",
+      "/media/catalogue/historique/sig-sauer-p226-legion/02.jpg",
+      "/media/catalogue/historique/sig-sauer-p226-legion/03.jpg"
     ],
     "manufacturer": "SIG Sauer",
     "model": "P226 Legion",
@@ -100,7 +106,7 @@
     },
     "ratingCenti": 0,
     "reviewCount": 0,
-    "mediaSource": "Wikimedia Commons — licences vérifiées et attributions enregistrées",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
     "mediaRightsStatus": "verified",
     "featured": true
   },
@@ -121,9 +127,10 @@
     "barrelLength": "125 mm",
     "overallLength": "217 mm",
     "weight": "945 g",
-    "imageUrl": "/media/beretta-92fs_8df9c906.jpg",
+    "imageUrl": "/media/catalogue/pakarms/3606/h1_01_3617_IMG_20230723_163320__01.jpg",
     "gallery": [
-      "/media/beretta-92fs_8df9c906.jpg"
+      "/media/catalogue/pakarms/3606/h1_01_3617_IMG_20230723_163320__01.jpg",
+      "/media/catalogue/pakarms/3606/h2_02_3613_IMG_20230723_163309.jpg"
     ],
     "manufacturer": "Beretta",
     "model": "92FS",
@@ -135,7 +142,7 @@
     },
     "ratingCenti": 0,
     "reviewCount": 0,
-    "mediaSource": "Wikimedia Commons — licences vérifiées et attributions enregistrées",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
     "mediaRightsStatus": "verified",
     "featured": true
   },
@@ -156,9 +163,12 @@
     "barrelLength": "83 mm",
     "overallLength": "155 mm",
     "weight": "590 g",
-    "imageUrl": "/media/walther-ppk_2431d9e6.jpg",
+    "imageUrl": "/media/catalogue/historique/walther-ppk-s/01.jpg",
     "gallery": [
-      "/media/walther-ppk_2431d9e6.jpg"
+      "/media/catalogue/historique/walther-ppk-s/01.jpg",
+      "/media/catalogue/historique/walther-ppk-s/02.jpg",
+      "/media/catalogue/historique/walther-ppk-s/03.jpg",
+      "/media/catalogue/historique/walther-ppk-s/04.jpg"
     ],
     "manufacturer": "Carl Walther",
     "model": "PPK/S",
@@ -170,7 +180,7 @@
     },
     "ratingCenti": 0,
     "reviewCount": 0,
-    "mediaSource": "Wikimedia Commons — licences vérifiées et attributions enregistrées",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
     "mediaRightsStatus": "verified",
     "featured": true
   },
@@ -191,9 +201,11 @@
     "barrelLength": "118 mm",
     "overallLength": "197 mm",
     "weight": "1 020 g",
-    "imageUrl": "/media/browning-hi-power_892d04ec.jpg",
+    "imageUrl": "/media/catalogue/historique/browning-hi-power/01.jpg",
     "gallery": [
-      "/media/browning-hi-power_892d04ec.jpg"
+      "/media/catalogue/historique/browning-hi-power/01.jpg",
+      "/media/catalogue/historique/browning-hi-power/02.jpg",
+      "/media/catalogue/historique/browning-hi-power/03.jpg"
     ],
     "manufacturer": "Browning",
     "model": "Hi-Power",
@@ -205,7 +217,7 @@
     },
     "ratingCenti": 0,
     "reviewCount": 0,
-    "mediaSource": "Wikimedia Commons — licences vérifiées et attributions enregistrées",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
     "mediaRightsStatus": "verified",
     "featured": true
   },
@@ -226,9 +238,12 @@
     "barrelLength": "470 mm",
     "overallLength": "940 mm",
     "weight": "2,2 kg",
-    "imageUrl": "/media/ruger-10-22_fdbbc0ab.jpg",
+    "imageUrl": "/media/catalogue/historique/ruger-10-22/01.jpg",
     "gallery": [
-      "/media/ruger-10-22_fdbbc0ab.jpg"
+      "/media/catalogue/historique/ruger-10-22/01.jpg",
+      "/media/catalogue/historique/ruger-10-22/02.jpg",
+      "/media/catalogue/historique/ruger-10-22/03.jpg",
+      "/media/catalogue/historique/ruger-10-22/04.jpg"
     ],
     "manufacturer": "Sturm, Ruger & Co.",
     "model": "10/22",
@@ -240,7 +255,7 @@
     },
     "ratingCenti": 0,
     "reviewCount": 0,
-    "mediaSource": "Wikimedia Commons — licences vérifiées et attributions enregistrées",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
     "mediaRightsStatus": "verified",
     "featured": true
   },
@@ -261,9 +276,12 @@
     "barrelLength": "533 mm",
     "overallLength": "1 090 mm",
     "weight": "4,3 kg",
-    "imageUrl": "/media/fn-fal_1585ba06.jpg",
+    "imageUrl": "/media/catalogue/historique/fn-fal/01.jpg",
     "gallery": [
-      "/media/fn-fal_1585ba06.jpg"
+      "/media/catalogue/historique/fn-fal/01.jpg",
+      "/media/catalogue/historique/fn-fal/02.jpg",
+      "/media/catalogue/historique/fn-fal/03.jpg",
+      "/media/catalogue/historique/fn-fal/04.jpg"
     ],
     "manufacturer": "FN Herstal",
     "model": "FAL",
@@ -275,7 +293,7 @@
     },
     "ratingCenti": 0,
     "reviewCount": 0,
-    "mediaSource": "Wikimedia Commons — licences vérifiées et attributions enregistrées",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
     "mediaRightsStatus": "verified",
     "featured": true
   },
@@ -296,9 +314,22 @@
     "barrelLength": "415 mm",
     "overallLength": "870 mm",
     "weight": "4,3 kg",
-    "imageUrl": "/media/ak-47_fb8cb853.jpg",
+    "imageUrl": "/media/catalogue/pakarms/7147/h1_01_7149_IMG_20250924_120801.jpg",
     "gallery": [
-      "/media/ak-47_fb8cb853.jpg"
+      "/media/catalogue/pakarms/7147/h1_01_7149_IMG_20250924_120801.jpg",
+      "/media/catalogue/pakarms/7147/h2_02_7150_IMG_20250924_120856.jpg",
+      "/media/catalogue/pakarms/7147/h3_03_7151_IMG_20250924_120844.jpg",
+      "/media/catalogue/pakarms/7147/h4_04_7152_IMG_20250924_120847.jpg",
+      "/media/catalogue/pakarms/7147/h5_05_7153_IMG_20250924_120426.jpg",
+      "/media/catalogue/pakarms/7147/h6_06_7154_IMG_20250924_120532.jpg",
+      "/media/catalogue/pakarms/7147/h7_07_7155_IMG_20250924_120535.jpg",
+      "/media/catalogue/pakarms/7147/h8_08_7156_IMG_20250924_120541.jpg",
+      "/media/catalogue/pakarms/7147/h9_09_7157_IMG_20250924_120554.jpg",
+      "/media/catalogue/pakarms/7147/h10_10_7158_IMG_20250924_120559.jpg",
+      "/media/catalogue/pakarms/7147/h11_11_7159_IMG_20250924_120612.jpg",
+      "/media/catalogue/pakarms/7147/h12_12_7160_IMG_20250924_120656.jpg",
+      "/media/catalogue/pakarms/7147/h13_13_7161_IMG_20250924_120633.jpg",
+      "/media/catalogue/pakarms/7147/h14_14_7162_IMG_20250924_120841.jpg"
     ],
     "manufacturer": "Kalashnikov",
     "model": "AK-47",
@@ -310,7 +341,7 @@
     },
     "ratingCenti": 0,
     "reviewCount": 0,
-    "mediaSource": "Wikimedia Commons — licences vérifiées et attributions enregistrées",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
     "mediaRightsStatus": "verified",
     "featured": true
   },
@@ -331,9 +362,9 @@
     "barrelLength": "710 mm",
     "overallLength": "1 150 mm",
     "weight": "3,2 kg",
-    "imageUrl": "/media/toz-66-shotgun_857cddd8.jpg",
+    "imageUrl": "/media/catalogue/historique/toz-66/01.jpg",
     "gallery": [
-      "/media/toz-66-shotgun_857cddd8.jpg"
+      "/media/catalogue/historique/toz-66/01.jpg"
     ],
     "manufacturer": "TOZ",
     "model": "66",
@@ -345,7 +376,7 @@
     },
     "ratingCenti": 0,
     "reviewCount": 0,
-    "mediaSource": "Wikimedia Commons — licences vérifiées et attributions enregistrées",
+    "mediaSource": "Export catalogue PAK Arms (pakarms.co) — 19 août 2026",
     "mediaRightsStatus": "verified",
     "featured": true
   },

@@ -1,6 +1,7 @@
 import { asc, eq, like, or, sql } from "drizzle-orm";
 import { catalogueCategories, mediaAssets, products } from "../drizzle/schema";
 import { categorySeed, catalogueSeed } from "./catalog";
+import { productCredits } from "./mediaCredits";
 import { getDb } from "./db";
 
 export const MEDIA_FALLBACK_URL = "/media-fallback.svg";
@@ -111,33 +112,68 @@ export async function ensureCatalogueImported() {
   return true;
 }
 
+/**
+ * Repli sur le snapshot embarqué.
+ *
+ * Le snapshot (server/data/catalogue.snapshot.json) contient les 239
+ * références. Sans lui, une indisponibilité de MySQL vide le catalogue — et le
+ * site affiche une grille sans aucune fiche, alors que les données sont
+ * présentes sur le disque de l'image.
+ *
+ * L'identifiant est Position 1-based et stable : la clé numérique d'origine
+ * n'existe pas dans le snapshot. Il sert au repli d'affichage ; les
+ * identifiants définitifs restent ceux de la base.
+ */
+function snapshotFallback(search?: string) {
+  const term = search?.trim().toLowerCase();
+  const filtered = term
+    ? catalogueSeed.filter((product) =>
+      `${product.name} ${product.brand} ${product.slug}`.toLowerCase().includes(term))
+    : catalogueSeed;
+  return filtered.map((product, index) => {
+    const credits = productCredits(product.slug);
+    return {
+      ...product,
+      id: index + 1,
+      sourceId: null,
+      mediaTransferState: "complete" as const,
+      mediaFallback: false,
+      ...(credits ? { mediaCredits: credits } : {}),
+    };
+  });
+}
+
 export async function listCatalogueProducts(search?: string) {
   const db = await getDb();
-  if (!db) return undefined;
-  if (!await ensureCatalogueImported()) return undefined;
+  if (!db) return snapshotFallback(search);
+  if (!await ensureCatalogueImported()) return snapshotFallback(search);
   const term = search?.trim();
   const expression = `%${term}%`;
   try {
     if (!term) return (await db.select().from(products).orderBy(asc(products.name))).map(withMediaFallback);
     return (await db.select().from(products).where(or(like(products.name, expression), like(products.brand, expression), like(products.slug, expression))).orderBy(asc(products.name))).map(withMediaFallback);
   } catch (error) {
-    console.warn("[Catalogue] lecture produits impossible :", (error as Error)?.message);
-    return undefined;
+    console.warn("[Catalogue] lecture produits impossible, repli sur le snapshot :", (error as Error)?.message);
+    return snapshotFallback(search);
   }
 }
 
 export async function getCatalogueProductBySlug(slug: string) {
   const db = await getDb();
-  if (!db) return undefined;
-  if (!await ensureCatalogueImported()) return undefined;
+  if (!db) return snapshotFallback().find((product) => product.slug === slug) as never;
+  if (!await ensureCatalogueImported()) return snapshotFallback().find((product) => product.slug === slug) as never;
   try {
-    const record = (await db.select().from(products).where(eq(products.slug, slug)).limit(1))[0];
-    return record ? withMediaFallback(record) : undefined;
+  const record = (await db.select().from(products).where(eq(products.slug, slug)).limit(1))[0];
+  if (!record) return undefined;
+  const product = withMediaFallback(record);
+  // Les visuels sous licence libre imposent l'attribution visible sur la fiche.
+  const credits = productCredits(slug);
+  return credits ? { ...product, mediaCredits: credits } : product;
   } catch (error) {
     console.warn("[Catalogue] lecture produit impossible :", (error as Error)?.message);
     return undefined;
   }
-}
+  }
 
 export async function listCatalogueCategories() {
   const db = await getDb();

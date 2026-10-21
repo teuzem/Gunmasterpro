@@ -71,6 +71,7 @@ const CONCURRENCY = 6;
 const PRODUCT_ROOT = "public/pakarms_catalog_export/images categories Gunmaster";
 const CATEGORY_DIR = "public/images categories";
 const HERO_DIR = "public/images hero section";
+const HISTORICAL_DIR = "public/historical-media";
 const OUTPUT = "tools/media-manifest.local.json";
 
 if (!BASE && !DRY_RUN) {
@@ -91,6 +92,10 @@ if (TOKEN && !/^[A-Za-z0-9._-]+$/.test(TOKEN)) {
 
 const manifest = JSON.parse(await readFile("tools/media-manifest.json", "utf8"));
 const categoryManifest = JSON.parse(await readFile("tools/category-images.json", "utf8"));
+// Le manifeste local fait autorité : il porte les clés définitives, y compris
+// celles des visuels historiques ajoutés après coup. Le manifeste Forge sert
+// seulement de repli pour retrouver les chemins d'origine.
+const existingManifest = JSON.parse(await readFile("tools/media-manifest.local.json", "utf8"));
 
 // --- Constitution du plan ---------------------------------------------------
 // Chaque entrée : { target, localPath, contentType, family, meta }
@@ -137,8 +142,30 @@ for (const [slug, product] of Object.entries(manifest.products)) {
   }
 }
 
+// Visuels historiques : fiches absentes de l'export, visuels issus de
+// Wikimedia Commons. Le manifeste local en porte les clés définitives.
+for (const [slug, product] of Object.entries(existingManifest.products ?? {})) {
+  for (const file of product.files ?? []) {
+    if (!file.key.startsWith("catalogue/historique/")) continue;
+    const localName = file.key.split("/").slice(-1)[0];
+    const index = Number(localName.replace(/\D/g, "")) - 1;
+    const source = (product.files ?? []).find((entry) => entry.index === index);
+    if (!source) continue;
+    plan.push({
+      target: file.key,
+      localPath: path.join(HISTORICAL_DIR, slug, source.file),
+      contentType: file.contentType,
+      family: "historical",
+      meta: { slug, file: source.file, index: file.index },
+    });
+  }
+}
+
 const selected = plan.filter((entry) => !ONLY || entry.family === ONLY);
-console.log(`Plan : ${selected.length} fichiers (hero ${selected.filter((e) => e.family === "hero").length}, catégories ${selected.filter((e) => e.family === "categories").length}, produits ${selected.filter((e) => e.family === "products").length})`);
+const count = (family) => selected.filter((entry) => entry.family === family).length;
+console.log(
+  `Plan : ${selected.length} fichiers (hero ${count("hero")}, catégories ${count("categories")}, produits ${count("products")}, historiques ${count("historical")})`,
+);
 
 if (DRY_RUN) {
   let bytes = 0;

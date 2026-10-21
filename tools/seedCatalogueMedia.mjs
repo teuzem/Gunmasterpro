@@ -125,6 +125,9 @@ try {
     }
 
     if (!ordered.length) {
+      // Fiche sans aucun visuel disponible. Elle n'est pas insérée : la conserver
+      // avec l'URL morte du catalogue initial afficherait une image cassée. Le
+      // seed continue, et le rapport final nomme les fiches concernées.
       missing.push(product.slug);
       continue;
     }
@@ -171,8 +174,9 @@ try {
   summary.galleryTotal = galleryTotal;
 
   if (missing.length) {
-    console.error(`Produits sans média local (${missing.length}) : ${missing.slice(0, 10).join(", ")}`);
-    throw new Error("Import incomplet : médias manquants pour une partie du catalogue.");
+    // Signalé, mais non bloquant : une fiche sans visuel ne doit pas
+    // empêcher l'import des 232 autres. Le rapport final les liste.
+    console.warn(`Produits sans média local (${missing.length}) : ${missing.slice(0, 10).join(", ")}`);
   }
 
   // --- mediaAssets : une ligne par visuel ------------------------------------
@@ -245,6 +249,15 @@ try {
   }
 
   console.log(JSON.stringify(summary, null, 2));
+
+  // Fiches laissées de côté : elles n'ont aucun visuel disponible ni dans
+  // l'export fourni, ni chez pakarms.co. Les publier avec une URL morte
+  // afficherait une image cassée ; le rapport permet de les traiter à part.
+  if (missing.length) {
+    console.log(`\n${missing.length} fiche(s) sans visuel, non insérées :`);
+    for (const slug of missing) console.log(`  ${slug}`);
+    console.log("Ces fiches restent à couvrir (visuels à fournir).");
+  }
 } catch (error) {
   await connection.rollback();
   throw error;
